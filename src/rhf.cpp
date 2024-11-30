@@ -17,9 +17,8 @@ RHF::RHF(standard_matrices& std_m, MOs& mo)
   eri_matrix(std_m.get_nAO());
   fock_matrix(std_m.get_nAO());
 
-	std::cout << "*****************************************\n"
-	          << "SCF procedure\n"
-	          << "Electrons:" << std_m.get_num_el() << std::endl
+	std::cout << "\n-- Running SCF procedure --\n"
+	          << "Electrons: " << std_m.get_num_el() << std::endl
 	          << "Max iterations: " << max_iter << std::endl
 	          << "Energy tolerance: " << etol << std::endl;
 }
@@ -124,7 +123,7 @@ void RHF::core_guess()
 }
 
 void RHF::roothan_hall(){
-  std::cout << "** Roothan-Hall algorithm started **";
+  std::cout << "\n** Roothan-Hall algorithm started **\n\n";
 	int iter = 0;
 
   core_guess();
@@ -155,7 +154,7 @@ void RHF::roothan_hall(){
 		validate_convergency(iter);
 	}
 
-	std::cout << "number of iterations = " << iter << '\n';
+	std::cout << "\nTotal iterations = " << iter << '\n';
 	mo.set_total_energy(E_new + std_m.get_total_Vnn());
 }
 
