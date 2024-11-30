@@ -9,15 +9,12 @@
 RHF::RHF(standard_matrices& std_m, MOs& mo)
     : etol(1e-12)
     , max_iter(100)
-    , diis_size(5)
     , iter(0)
     , is_converged(false)
-    , diis_mode(false)
     , std_m(std_m)
     , mo(mo)
     , prev_energy(1)
     , cur_energy(0)
-    , diis_coefs(diis_size, (double) 1 / diis_size)
 {
     evec = new double[std_m.get_nAO() * std_m.get_nAO()];
     eval = new double[std_m.get_nAO()];
@@ -41,11 +38,6 @@ RHF::~RHF()
 bool RHF::get_convergency()
 {
     return is_converged;
-}
-
-bool RHF::validate_diis_condition()
-{
-   return ((int)error_buffer.size() >= diis_size);
 }
 
 void RHF::validate_convergency()
@@ -138,10 +130,6 @@ void RHF::direct_iteration()
 
     calculate_coef_matrix();
 
-    update_error_buffer();
-
-    update_fock_buffer();
-
     for (int i = 0; i < std_m.get_nAO(); ++i) {
         mo.set_mo_energy(i, eval[i]);
     }
@@ -164,65 +152,14 @@ void RHF::roothan_hall()
         direct_iteration();
 
         iter++;
-        verbose_iteration();
-        validate_convergency();
-        recalculate_energy();
-        validate_diis_condition();
-    }
 
-    if (!is_converged) {
-        diis();
+        verbose_iteration();
+
+        validate_convergency();
+
+        recalculate_energy();
     }
 
     std::cout << "\nTotal iterations = " << iter << '\n';
     mo.set_total_energy(cur_energy + std_m.get_total_Vnn());
-}
-
-void RHF::update_error_buffer()
-{
-    matrix error_matrix(std_m.get_nAO());
-    error_matrix = fock_matrix * density * std_m.S - std_m.S * density * fock_matrix;
-    if ((int)error_buffer.size() >= diis_size) {
-        error_buffer.pop_front();
-    }
-    error_buffer.push_back(error_matrix);
-}
-
-void RHF::update_fock_buffer()
-{
-    if ((int)fock_buffer.size() >= diis_size) {
-        fock_buffer.pop_front();
-    }
-    fock_buffer.push_back(fock_matrix);
-}
-
-void RHF::calculate_diis_coefs()
-{
-    // TODO: implement me!
-}
-
-void RHF::calculate_diis_fock_matrix_transformed()
-{
-    fock_matrix.zeroize();
-    for (int i = 0; i < diis_size; ++i) {
-        fock_matrix += (fock_buffer[i] * diis_coefs[i]);
-    }
-}
-
-void RHF::diis()
-{
-    std::cout << "\n-- DIIS approximation started --\n";
-    std::cout << "DIIS buffer size: " << diis_size << "\n\n";
-
-    while (!is_converged) {
-        calculate_diis_coefs();
-
-        calculate_diis_fock_matrix_transformed();
-
-        direct_iteration();
-
-        iter++;
-        verbose_iteration();
-        validate_convergency();
-    }
 }
