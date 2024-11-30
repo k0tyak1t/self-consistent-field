@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     }
 
     loader.makeBasis();
-    //loader.printBasis();
+    // loader.printBasis();
 
     if (!loader.calc(sm)) {
         throw std::runtime_error("Failed to calculate standard matrices!\n");

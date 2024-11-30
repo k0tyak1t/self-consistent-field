@@ -24,6 +24,7 @@ public:
 	void zeroize();
   //matrix zero_like(const matrix&); // TODO: implement.
 	matrix operator+(const matrix&);
+  matrix& operator+=(const matrix&);
 	matrix operator-(const matrix&);
 	matrix operator*(const matrix&);
 	matrix operator*(const double);

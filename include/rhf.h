@@ -1,6 +1,7 @@
 #ifndef RHF_H
 #define RHF_H
 #include <vector>
+#include <deque>
 #include "matrix.h"
 #include "standard_matrices.h"
 #include "mo.h"
@@ -12,15 +13,18 @@ public:
 	bool get_convergency();
   void validate_diis_condition(const int);
 	void validate_convergency(const int);
-  void build_density();
+  void calculate_density();
   void calculate_eri_matrix();
   void calculate_fock_transformed();
   double recalculate_energy();
   void calculate_coef_matrix();
   void verbose_iteration(const int);
   void core_guess();
+  void direct_iteration();
 	void roothan_hall();
   void calculate_error();
+  void calculate_diis_coefs();
+  void calculate_diis_fock_matrix_transformed();
   void diis();
 
 private:
@@ -33,7 +37,8 @@ private:
   double* evec;
   double* eval;
   matrix density, eri_matrix, fock_matrix;
-  std::vector<matrix> error_buffer;
+  std::deque<matrix> error_buffer;
+  std::vector<double> diis_coefs;
 };
 
 #endif

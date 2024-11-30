@@ -1,8 +1,8 @@
-#include "utils.h"
 #include "input_and_md_integrals.h"
 #include "matrix.h"
 #include "mur_dav_prim_integrals.h"
 #include "standard_matrices.h"
+#include "utils.h"
 #include <cmath>
 
 bool InputAndMDIntegrals::readGeom(char* filename)

@@ -84,10 +84,10 @@ int MurDavPrimIntegrals::calcRntuv(double* R,
         for (int n = 0; n < nmax; n++)
             R[n * ndim + tdim] = xPA * R[(n + 1) * ndim];
         for (int t = 1; t < tmax; t++)
-        for (int n = 0; n < nmax - t; n++) {
-            xR = (n + 1) * ndim + t * tdim;
-            R[xR - ndim + tdim] = xPA * R[xR] + t * R[xR - tdim];
-        }
+            for (int n = 0; n < nmax - t; n++) {
+                xR = (n + 1) * ndim + t * tdim;
+                R[xR - ndim + tdim] = xPA * R[xR] + t * R[xR - tdim];
+            }
     }
     if (umax > 0) {
         for (int t = 0; t <= tmax; t++)
