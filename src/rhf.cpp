@@ -10,12 +10,14 @@ RHF::RHF(standard_matrices& std_m, MOs& mo)
     : etol(1e-12)
     , max_iter(100)
     , diis_size(5)
+    , iter(0)
     , is_converged(false)
     , diis_mode(false)
     , std_m(std_m)
     , mo(mo)
-    , E_old(0)
-    , E_new(0)
+    , prev_energy(1)
+    , cur_energy(0)
+    , diis_coefs(diis_size, (double) 1 / diis_size)
 {
     evec = new double[std_m.get_nAO() * std_m.get_nAO()];
     eval = new double[std_m.get_nAO()];
@@ -41,14 +43,14 @@ bool RHF::get_convergency()
     return is_converged;
 }
 
-void RHF::validate_diis_condition(const int rh_iter)
+bool RHF::validate_diis_condition()
 {
-    diis_mode = ((int)error_buffer.size() >= diis_size);
+   return ((int)error_buffer.size() >= diis_size);
 }
 
-void RHF::validate_convergency(const int iter)
+void RHF::validate_convergency()
 {
-    is_converged = (fabs(E_old - E_new) < etol);
+    is_converged = (fabs(prev_energy - cur_energy) < etol);
 
     if (iter > max_iter) {
         throw std::runtime_error("SCF algorithm has not converged in " + std::to_string(max_iter) + "iterations!\n");
@@ -87,23 +89,22 @@ void RHF::calculate_fock_transformed()
     fock_matrix = std_m.X * fock_matrix * std_m.X;
 }
 
-double RHF::recalculate_energy()
+void RHF::recalculate_energy()
 {
-    double E_new = 0;
+    prev_energy = cur_energy;
+    cur_energy = 0;
 
     for (int i = 0; i < std_m.get_num_el() / 2; ++i) {
         for (int j = 0; j < std_m.get_nAO(); ++j) {
             for (int k = 0; k < std_m.get_nAO(); ++k) {
-                E_new += mo.C[j][i] * mo.C[k][i] * std_m.H[j][k];
+                cur_energy += mo.C[j][i] * mo.C[k][i] * std_m.H[j][k];
             }
         }
     }
 
     for (int i = 0; i < std_m.get_num_el() / 2; ++i) {
-        E_new += eval[i];
+        cur_energy += eval[i];
     }
-
-    return E_new;
 }
 
 void RHF::calculate_coef_matrix()
@@ -112,11 +113,11 @@ void RHF::calculate_coef_matrix()
     mo.C = std_m.X * mo.C.T();
 }
 
-void RHF::verbose_iteration(const int iter)
+void RHF::verbose_iteration()
 {
     std::cout << "#"
               << std::setw(5) << iter << std::setw(20)
-              << std::setprecision(12) << E_new + std_m.get_total_Vnn() << '\n';
+              << std::setprecision(12) << cur_energy + std_m.get_total_Vnn() << '\n';
 }
 
 void RHF::core_guess()
@@ -124,8 +125,7 @@ void RHF::core_guess()
     mo.init(std_m.get_nAO());
     fock_matrix = std_m.X * fock_matrix * std_m.X;
     fock_matrix.eigen_vv(evec, eval);
-    mo.C.from_array(evec);
-    mo.C = std_m.X * mo.C.T();
+    calculate_coef_matrix();
 
     for (int i = 0; i < std_m.get_nAO(); ++i) {
         mo.set_mo_energy(i, eval[i]);
@@ -138,24 +138,22 @@ void RHF::direct_iteration()
 
     calculate_coef_matrix();
 
-    calculate_error();
+    update_error_buffer();
+
+    update_fock_buffer();
 
     for (int i = 0; i < std_m.get_nAO(); ++i) {
         mo.set_mo_energy(i, eval[i]);
     }
-
-    E_old = E_new;
-    E_new = recalculate_energy();
 }
 
 void RHF::roothan_hall()
 {
     std::cout << "\n-- Roothan-Hall algorithm started --\n\n";
-    int iter = 0;
 
     core_guess();
 
-    while (!is_converged && !diis_mode) {
+    while (!is_converged) {
 
         calculate_density();
 
@@ -166,15 +164,21 @@ void RHF::roothan_hall()
         direct_iteration();
 
         iter++;
-        verbose_iteration(iter);
-        validate_convergency(iter);
+        verbose_iteration();
+        validate_convergency();
+        recalculate_energy();
+        validate_diis_condition();
+    }
+
+    if (!is_converged) {
+        diis();
     }
 
     std::cout << "\nTotal iterations = " << iter << '\n';
-    mo.set_total_energy(E_new + std_m.get_total_Vnn());
+    mo.set_total_energy(cur_energy + std_m.get_total_Vnn());
 }
 
-void RHF::calculate_error()
+void RHF::update_error_buffer()
 {
     matrix error_matrix(std_m.get_nAO());
     error_matrix = fock_matrix * density * std_m.S - std_m.S * density * fock_matrix;
@@ -182,6 +186,14 @@ void RHF::calculate_error()
         error_buffer.pop_front();
     }
     error_buffer.push_back(error_matrix);
+}
+
+void RHF::update_fock_buffer()
+{
+    if ((int)fock_buffer.size() >= diis_size) {
+        fock_buffer.pop_front();
+    }
+    fock_buffer.push_back(fock_matrix);
 }
 
 void RHF::calculate_diis_coefs()
@@ -193,14 +205,14 @@ void RHF::calculate_diis_fock_matrix_transformed()
 {
     fock_matrix.zeroize();
     for (int i = 0; i < diis_size; ++i) {
-        fock_matrix += (error_buffer[i] * diis_coefs[i]);
+        fock_matrix += (fock_buffer[i] * diis_coefs[i]);
     }
 }
 
 void RHF::diis()
 {
-    std::cout << "-- DIIS approximation started --\n";
-    int iter = 0;
+    std::cout << "\n-- DIIS approximation started --\n";
+    std::cout << "DIIS buffer size: " << diis_size << "\n\n";
 
     while (!is_converged) {
         calculate_diis_coefs();
@@ -210,8 +222,7 @@ void RHF::diis()
         direct_iteration();
 
         iter++;
-
-        verbose_iteration(iter);
-        validate_convergency(iter);
+        verbose_iteration();
+        validate_convergency();
     }
 }
