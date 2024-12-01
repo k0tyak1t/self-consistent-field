@@ -17,7 +17,7 @@ RHF::RHF(standard_matrices& std_m, MOs& mo)
     , cur_energy(0)
 {
     evec = new double[std_m.get_nAO() * std_m.get_nAO()];
-    eval = new double[std_m.get_nAO()];
+    mo_energies = new double[std_m.get_nAO()];
 
     density(std_m.get_nAO());
     eri_matrix(std_m.get_nAO());
@@ -31,7 +31,7 @@ RHF::RHF(standard_matrices& std_m, MOs& mo)
 
 RHF::~RHF()
 {
-    delete[] eval;
+    delete[] mo_energies;
     delete[] evec;
 }
 
@@ -50,7 +50,7 @@ void RHF::validate_convergency()
     is_converged = (fabs(prev_energy - cur_energy) < etol);
 
     if (iter > max_iter) {
-        throw std::runtime_error("SCF algorithm has not converged in " + std::to_string(max_iter) + "iterations!\n");
+        throw std::runtime_error("SCF algorithm has not converged in " + std::to_string(max_iter) + " iterations!\n");
     }
 }
 
@@ -99,14 +99,14 @@ void RHF::update_energy()
     }
 
     for (int i = 0; i < std_m.get_num_el() / 2; ++i) {
-        cur_energy += eval[i];
+        cur_energy += mo_energies[i];
     }
 }
 
 void RHF::calculate_expansion()
 {
     mo.C.from_array(evec);
-    mo.C = std_m.X * mo.C.T(); // because it can be calculated only form F'
+    mo.C = std_m.X * mo.C.T();
 }
 
 void RHF::print_iteration()
@@ -124,12 +124,9 @@ void RHF::core_guess()
 
 void RHF::direct_iteration()
 {
-    transform_matrix(fock_matrix).eigen_vv(evec, eval);
+    transform_matrix(fock_matrix).eigen_vv(evec, mo_energies);
+    mo.set_mo_energies(mo_energies);
     calculate_expansion();
-
-    for (int i = 0; i < std_m.get_nAO(); ++i) {
-        mo.set_mo_energy(i, eval[i]);
-    }
 }
 
 void RHF::roothan_hall()

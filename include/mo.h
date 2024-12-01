@@ -15,6 +15,7 @@ public:
 	double check_ij(const int, const int, const char*) const;
 	int get_irrep(const int&) const;
 	bool set_c2v(int* symmAO, const double& limit);
+  void set_mo_energies(const double*);
 private:
 	int n;   //размерность базиса данной задачи
 	double* mo_energies; //массив из энергий молекулярных орбиталей

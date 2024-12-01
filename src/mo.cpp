@@ -1,11 +1,9 @@
 #include "mo.h"
 #include <cmath>
 #include <iostream>
+#include <cstring>
 
-MOs::MOs()
-    : n(0)
-{
-}
+MOs::MOs(): n(0) {}
 
 MOs::~MOs()
 {
@@ -99,4 +97,9 @@ bool MOs::set_c2v(int* symmAO, const double& limit)
         }
     }
     return true;
+}
+
+void MOs::set_mo_energies(const double* new_mo_energies)
+{
+  memcpy(mo_energies, new_mo_energies, n * sizeof(double));
 }

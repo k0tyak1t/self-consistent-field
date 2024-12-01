@@ -31,7 +31,7 @@ private:
 	MOs& mo;
   double prev_energy, cur_energy;
   double* evec;
-  double* eval;
+  double* mo_energies;
   matrix density, eri_matrix, fock_matrix;
 };
 
