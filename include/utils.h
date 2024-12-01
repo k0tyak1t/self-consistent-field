@@ -2,7 +2,7 @@
 #define UTILS_H
 #include <iostream>
 
-void display_progress(int progress, const std::string& leading_str)
+void display_progress(int progress, const std::string& leading_str) // TODO: fix behavior. (incorrect displaying of short data.)
 {
   int progress_bar_width = 30;
   int cursor_position = progress_bar_width * progress / 100;

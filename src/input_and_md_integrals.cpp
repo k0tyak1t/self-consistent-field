@@ -4,9 +4,13 @@
 #include "standard_matrices.h"
 #include "utils.h"
 #include <cmath>
+#include <string>
 
 bool InputAndMDIntegrals::readGeom(char* filename)
 {
+    int i = 0;
+    double progress = 0;
+    std::string leading_str = "Reading deometry: ";
     ifstream inp(filename);
     int nAtoms;
     inp >> nAtoms;
@@ -23,6 +27,8 @@ bool InputAndMDIntegrals::readGeom(char* filename)
         if (atomTmp.q == 0)
             return false;
         atoms.push_back(atomTmp);
+        display_progress(progress, leading_str);
+        progress = (++i) / nAtoms * 100;
     }
     inp.close();
     if (nAtoms != int(atoms.size())) {
@@ -124,13 +130,15 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
     }
     //	расчет двуэлектронных интегралов
     ii = jj = kk = ll = 0;
+
     unsigned char progress;
-    std::cout << "ERI calculation started\n";
+    std::string leading_str = "ERI calculation: ";
+
     const int ii_end = int(basisFunctions.size());
     for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i = basisFunctions.begin(); i != basisFunctions.end(); i++) {
 
         progress = 100 * (ii + 1) / ii_end;
-        display_progress(progress);
+        display_progress(progress, leading_str);
 
         jj = kk = ll = 0;
         for (vector<vector<pair<int, SingleBasisFunction>>>::iterator j = basisFunctions.begin(); j != basisFunctions.end(); j++) {
@@ -268,10 +276,17 @@ bool InputAndMDIntegrals::set_c2v_z(int* symmAO)
 
 bool InputAndMDIntegrals::makeBasis()
 {
+    int i = 0;
+    int progress = 0;
     vector<pair<double, double>> kk1;
     vector<pair<double, double>> kk2;
     kk1 = kk2;
+    std::cout << "\n";
     for (vector<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); ++atom) {
+        display_progress(progress, "Loading basis: ");
+        i++;
+        progress = 100 * (i + 1) / atoms.size();
+
         map<int, vector<pair<int, vector<pair<double, double>>>>>::iterator basis = basisLib.find((*atom).q);
         if (basis == basisLib.end()) {
             std::cerr << "Для атома с зарядом " << (*atom).q << " в базисной библиотеке не был найден базис\n";
