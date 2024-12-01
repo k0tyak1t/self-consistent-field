@@ -40,6 +40,11 @@ bool RHF::get_convergency()
     return is_converged;
 }
 
+matrix RHF::transform_matrix(const matrix& source_matrix)
+{
+  return std_m.X * source_matrix * std_m.X;
+}
+
 void RHF::validate_convergency()
 {
     is_converged = (fabs(prev_energy - cur_energy) < etol);
@@ -75,13 +80,12 @@ void RHF::calculate_eri_matrix()
     }
 }
 
-void RHF::calculate_fock_transformed()
+void RHF::calculate_fock()
 {
-    fock_matrix = std_m.H + eri_matrix;
-    fock_matrix = std_m.X * fock_matrix * std_m.X;
+  fock_matrix = std_m.H + eri_matrix;
 }
 
-void RHF::recalculate_energy()
+void RHF::update_energy()
 {
     prev_energy = cur_energy;
     cur_energy = 0;
@@ -99,15 +103,15 @@ void RHF::recalculate_energy()
     }
 }
 
-void RHF::calculate_coef_matrix()
+void RHF::calculate_expansion()
 {
     mo.C.from_array(evec);
-    mo.C = std_m.X * mo.C.T();
+    mo.C = std_m.X * mo.C.T(); // because it can be calculated only form F'
 }
 
-void RHF::verbose_iteration()
+void RHF::print_iteration()
 {
-    std::cout << "#"
+    std::cout << "# "
               << std::setw(5) << iter << std::setw(20)
               << std::setprecision(12) << cur_energy + std_m.get_total_Vnn() << '\n';
 }
@@ -115,20 +119,13 @@ void RHF::verbose_iteration()
 void RHF::core_guess()
 {
     mo.init(std_m.get_nAO());
-    fock_matrix = std_m.X * fock_matrix * std_m.X;
-    fock_matrix.eigen_vv(evec, eval);
-    calculate_coef_matrix();
-
-    for (int i = 0; i < std_m.get_nAO(); ++i) {
-        mo.set_mo_energy(i, eval[i]);
-    }
+    direct_iteration();
 }
 
 void RHF::direct_iteration()
 {
-    fock_matrix.eigen_vv(evec, eval);
-
-    calculate_coef_matrix();
+    transform_matrix(fock_matrix).eigen_vv(evec, eval);
+    calculate_expansion();
 
     for (int i = 0; i < std_m.get_nAO(); ++i) {
         mo.set_mo_energy(i, eval[i]);
@@ -147,17 +144,17 @@ void RHF::roothan_hall()
 
         calculate_eri_matrix();
 
-        calculate_fock_transformed();
+        calculate_fock();
 
         direct_iteration();
 
         iter++;
 
-        verbose_iteration();
+        print_iteration();
 
         validate_convergency();
 
-        recalculate_energy();
+        update_energy();
     }
 
     std::cout << "\nTotal iterations = " << iter << '\n';
