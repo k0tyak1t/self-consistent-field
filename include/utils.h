@@ -1,3 +1,5 @@
+#ifndef UTILS_H
+#define UTILS_H
 #include <iostream>
 
 void display_progress(int progress, const std::string& leading_str)
@@ -16,3 +18,5 @@ void display_progress(int progress, const std::string& leading_str)
   std::cout << " " << int(progress) << " %\r";
   std::cout.flush();
 }
+
+#endif // UTILS_H
