@@ -109,6 +109,36 @@ void RHF::calculate_expansion()
     mo.C = std_m.X * mo.C.T();
 }
 
+void RHF::calculate_diis_coefs()
+{
+  // TODO: to be implemented
+}
+
+void RHF::calculate_diis_fock()
+{
+  // TODO: to be implemented
+}
+
+void RHF::calculate_diis_error()
+{
+  // TODO: to be implemented
+}
+
+void RHF::update_error_buffer()
+{
+  // TODO: to be implemented
+}
+
+void RHF::update_fock_buffer()
+{
+  // TODO: to be implemented
+}
+
+void RHF::calculate_pre_diis_error()
+{
+  // TODO: to be implemented
+}
+
 void RHF::print_iteration()
 {
     std::cout << "# "
@@ -127,6 +157,39 @@ void RHF::direct_iteration()
     transform_matrix(fock_matrix).eigen_vv(evec, mo_energies);
     mo.set_mo_energies(mo_energies);
     calculate_expansion();
+}
+
+void RHF::solve_rhf()
+{
+  core_guess();
+  std::cout << "--Roothan-Hall algorithm started --\n";
+  while (!is_converged) {
+    if (iter == diis_size) {
+      std::cout << "-- DIIS approximation started --\n";
+    }
+    iter < diis_size ? roothan_hall_step(): diis_step();
+    update_fock_buffer();
+    update_error_buffer();
+    direct_iteration();
+    iter++;
+    print_iteration();
+    validate_convergency();
+    update_energy();
+  }
+}
+
+void RHF::roothan_hall_step()
+{
+  calculate_density();
+  calculate_eri_matrix();
+  calculate_fock();
+  calculate_pre_diis_error();
+}
+void RHF::diis_step()
+{
+  calculate_diis_coefs();
+  calculate_diis_fock();
+  calculate_diis_error();
 }
 
 void RHF::roothan_hall()
