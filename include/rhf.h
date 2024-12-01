@@ -11,13 +11,14 @@ public:
   RHF(standard_matrices&, MOs&);
 	~RHF();
 	bool get_convergency();
+  matrix transform_matrix(const matrix&);
 	void validate_convergency();
+  void print_iteration();
+  void calculate_fock();
   void calculate_density();
   void calculate_eri_matrix();
-  void calculate_fock_transformed();
-  void recalculate_energy();
-  void calculate_coef_matrix();
-  void verbose_iteration();
+  void update_energy();
+  void calculate_expansion();
   void core_guess();
   void direct_iteration();
 	void roothan_hall();
@@ -32,8 +33,6 @@ private:
   double* evec;
   double* eval;
   matrix density, eri_matrix, fock_matrix;
-  //std::deque<matrix> error_buffer;
-  //std::vector<double> diis_coefs;
 };
 
 #endif
