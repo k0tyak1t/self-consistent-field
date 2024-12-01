@@ -1,8 +1,8 @@
 #include "input_and_md_integrals.h"
 #include "mo.h"
-#include "output.h"
 #include "rhf.h"
 #include "standard_matrices.h"
+#include "utils.h"
 #include <iomanip>
 #include <iostream>
 #include <string>
@@ -25,7 +25,6 @@ int main(int argc, char** argv)
     }
 
     loader.makeBasis();
-    // loader.printBasis();
 
     if (!loader.calc(sm)) {
         throw std::runtime_error("Failed to calculate standard matrices!\n");
@@ -34,7 +33,6 @@ int main(int argc, char** argv)
     RHF rhf(sm, mo);
     rhf.roothan_hall();
 
-    // output().run(mo);
-    output().print_energies_only(mo);
+    print_energies(mo);
     return 0;
 }

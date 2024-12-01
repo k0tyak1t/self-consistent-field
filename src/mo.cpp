@@ -1,9 +1,12 @@
 #include "mo.h"
 #include <cmath>
-#include <iostream>
 #include <cstring>
+#include <iostream>
 
-MOs::MOs(): n(0) {}
+MOs::MOs()
+    : n(0)
+{
+}
 
 MOs::~MOs()
 {
@@ -49,22 +52,16 @@ double MOs::check_ij(const int i, const int j, const char* name) const
 
 double MOs::get_mo_energy(const int i) const
 {
-    if (check_ij(i, 0, "get_mo_energy") > 0)
-        return 1;
     return mo_energies[i];
 }
 
 int MOs::get_irrep(const int& i) const
 {
-    if (check_ij(i, 0, "get_irrep") > 0)
-        return 1;
     return irrep[i];
 }
 
 int MOs::set_mo_energy(const int i, const double energy_i)
 {
-    if (check_ij(i, 0, "set_mo_energy") > 0)
-        return 1;
     mo_energies[i] = energy_i;
     return 0;
 }
@@ -83,9 +80,9 @@ double MOs::get_total_energy() const
 bool MOs::set_c2v(int* symmAO, const double& limit)
 {
     if (n == 0) {
-        std::cerr << "Попытка определить симметрию МО, когда они еще не заданы!\n";
-        return false;
+        throw std::runtime_error("Failed to set undifined MO symmetry!\n");
     }
+
     double tmpC;
     for (int idMO = 0; idMO < n; idMO++) {
         irrep[idMO] = 0;
@@ -101,5 +98,5 @@ bool MOs::set_c2v(int* symmAO, const double& limit)
 
 void MOs::set_mo_energies(const double* new_mo_energies)
 {
-  memcpy(mo_energies, new_mo_energies, n * sizeof(double));
+    memcpy(mo_energies, new_mo_energies, n * sizeof(double));
 }

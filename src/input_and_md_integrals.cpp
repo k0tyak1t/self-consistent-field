@@ -278,12 +278,13 @@ bool InputAndMDIntegrals::makeBasis()
 {
     int i = 0;
     int progress = 0;
+    std::string leading_str = "Loading basis: ";
     vector<pair<double, double>> kk1;
     vector<pair<double, double>> kk2;
     kk1 = kk2;
     std::cout << "\n";
     for (vector<Atom>::iterator atom = atoms.begin(); atom != atoms.end(); ++atom) {
-        display_progress(progress, "Loading basis: ");
+        display_progress(progress, leading_str);
         i++;
         progress = 100 * (i + 1) / atoms.size();
 

@@ -42,7 +42,7 @@ bool RHF::get_convergency()
 
 matrix RHF::transform_matrix(const matrix& source_matrix)
 {
-  return std_m.X * source_matrix * std_m.X;
+    return std_m.X * source_matrix * std_m.X;
 }
 
 void RHF::validate_convergency()
@@ -82,7 +82,7 @@ void RHF::calculate_eri_matrix()
 
 void RHF::calculate_fock()
 {
-  fock_matrix = std_m.H + eri_matrix;
+    fock_matrix = std_m.H + eri_matrix;
 }
 
 void RHF::update_energy()
@@ -111,32 +111,44 @@ void RHF::calculate_expansion()
 
 void RHF::calculate_diis_coefs()
 {
-  // TODO: to be implemented
+    // TODO: to be implemented
 }
 
 void RHF::calculate_diis_fock()
 {
-  // TODO: to be implemented
+    fock_matrix.zeroize();
+    for (int i = 0; i < diis_size; ++i) {
+        fock_matrix += (fock_buffer[i] * diis_coefs[i]);
+    }
 }
 
 void RHF::calculate_diis_error()
 {
-  // TODO: to be implemented
+    error_matrix.zeroize();
+    for (int i = 0; i < diis_size; ++i) {
+        error_matrix += (error_buffer[i] * diis_coefs[i]);
+    }
 }
 
 void RHF::update_error_buffer()
 {
-  // TODO: to be implemented
+    if ((int)error_buffer.size() == diis_size) {
+        error_buffer.pop_front();
+    }
+    error_buffer.push_back(error_matrix);
 }
 
 void RHF::update_fock_buffer()
 {
-  // TODO: to be implemented
+    if ((int)fock_buffer.size() == diis_size) {
+        fock_buffer.pop_front();
+    }
+    fock_buffer.push_back(fock_matrix);
 }
 
 void RHF::calculate_pre_diis_error()
 {
-  // TODO: to be implemented
+    error_matrix = fock_matrix * density * std_m.S - std_m.S * density * fock_matrix;
 }
 
 void RHF::print_iteration()
@@ -161,35 +173,35 @@ void RHF::direct_iteration()
 
 void RHF::solve_rhf()
 {
-  core_guess();
-  std::cout << "--Roothan-Hall algorithm started --\n";
-  while (!is_converged) {
-    if (iter == diis_size) {
-      std::cout << "-- DIIS approximation started --\n";
+    core_guess();
+    std::cout << "--Roothan-Hall algorithm started --\n";
+    while (!is_converged) {
+        if (iter == diis_size) {
+            std::cout << "-- DIIS approximation started --\n";
+        }
+        iter < diis_size ? roothan_hall_step() : diis_step();
+        update_fock_buffer();
+        update_error_buffer();
+        direct_iteration();
+        iter++;
+        print_iteration();
+        validate_convergency();
+        update_energy();
     }
-    iter < diis_size ? roothan_hall_step(): diis_step();
-    update_fock_buffer();
-    update_error_buffer();
-    direct_iteration();
-    iter++;
-    print_iteration();
-    validate_convergency();
-    update_energy();
-  }
 }
 
 void RHF::roothan_hall_step()
 {
-  calculate_density();
-  calculate_eri_matrix();
-  calculate_fock();
-  calculate_pre_diis_error();
+    calculate_density();
+    calculate_eri_matrix();
+    calculate_fock();
+    calculate_pre_diis_error();
 }
 void RHF::diis_step()
 {
-  calculate_diis_coefs();
-  calculate_diis_fock();
-  calculate_diis_error();
+    calculate_diis_coefs();
+    calculate_diis_fock();
+    calculate_diis_error();
 }
 
 void RHF::roothan_hall()

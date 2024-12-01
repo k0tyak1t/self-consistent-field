@@ -41,7 +41,9 @@ private:
   double prev_energy, cur_energy;
   double* evec;
   double* mo_energies;
-  matrix density, eri_matrix, fock_matrix;
+  matrix density, eri_matrix, fock_matrix, error_matrix;
+  std::deque<matrix> fock_buffer, error_buffer;
+  std::vector<double> diis_coefs;
 };
 
 #endif

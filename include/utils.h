@@ -1,22 +1,14 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include <iostream>
+#include <string>
+#include "mo.h"
+#include <vector>
+#include <deque>
 
-void display_progress(int progress, const std::string& leading_str) // TODO: fix behavior. (incorrect displaying of short data.)
-{
-  int progress_bar_width = 30;
-  int cursor_position = progress_bar_width * progress / 100;
-  std::cout << leading_str;
-  for (int i = 0; i < progress_bar_width; ++i) {
-    if (i <= cursor_position) {
-      std::cout << "█";
-    } else {
-      std::cout << "▒";
-    }
-  }
-
-  std::cout << " " << int(progress) << " %\r";
-  std::cout.flush();
-}
+void print_orbitals(const MOs&);
+void print_energies(const MOs&);
+void display_progress(int, const std::string&);
+double scalar_product(const std::vector<double>&, const std::vector<double>&);
 
 #endif // UTILS_H
