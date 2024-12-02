@@ -8,9 +8,6 @@
 
 bool InputAndMDIntegrals::readGeom(char* filename)
 {
-    int i = 0;
-    double progress = 0;
-    std::string leading_str = "Reading deometry: ";
     ifstream inp(filename);
     int nAtoms;
     inp >> nAtoms;
@@ -27,8 +24,6 @@ bool InputAndMDIntegrals::readGeom(char* filename)
         if (atomTmp.q == 0)
             return false;
         atoms.push_back(atomTmp);
-        display_progress(progress, leading_str);
-        progress = (++i) / nAtoms * 100;
     }
     inp.close();
     if (nAtoms != int(atoms.size())) {
@@ -44,7 +39,7 @@ bool InputAndMDIntegrals::readBasisLib(char* filename)
     string tmp_str;
     double C, a;
     int nFunc, tmp_int, idAtom;
-    vector<pair<int, vector<pair<double, double>>>> singleAtomBL; // это пиздец!
+    vector<pair<int, vector<pair<double, double>>>> singleAtomBL;
     vector<pair<double, double>> singleBF;
 
     inp >> tmp_str;
@@ -132,13 +127,9 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
     ii = jj = kk = ll = 0;
 
     unsigned char progress;
-    std::string leading_str = "ERI calculation: ";
 
     const int ii_end = int(basisFunctions.size());
     for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i = basisFunctions.begin(); i != basisFunctions.end(); i++) {
-
-        progress = 100 * (ii + 1) / ii_end;
-        display_progress(progress, leading_str);
 
         jj = kk = ll = 0;
         for (vector<vector<pair<int, SingleBasisFunction>>>::iterator j = basisFunctions.begin(); j != basisFunctions.end(); j++) {
@@ -176,6 +167,8 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
             jj++;
         }
         ii++;
+        progress = 100 * ii / ii_end;
+        display_progress(progress, "ERI calculation: ");
     }
     std::cout << std::endl;
     //	Матрица X

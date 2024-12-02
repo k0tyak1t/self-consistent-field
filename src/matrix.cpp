@@ -115,7 +115,8 @@ int matrix::get_row(const int i, double* a) const
 int matrix::get_matrix_elements(double* a) const
 {
     if (n == 0) {
-        std::cerr << "** ERROR *** array not defined in " << "get_matrix_elements" << '\n';
+        std::cerr << "** ERROR *** array not defined in "
+                  << "get_matrix_elements" << '\n';
         return 1;
     };
     for (int i = 0; i < n; i++)

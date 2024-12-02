@@ -20,6 +20,7 @@ int main(int argc, char** argv)
     InputAndMDIntegrals loader;
     MOs mo;
 
+    std::cout << "-- Preparing --\n";
     if (!loader.readGeom(mol_name) || !loader.readBasisLib(basis)) {
         throw std::runtime_error("Failed to load geometry or basis!\n");
     }
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
     }
 
     RHF rhf(sm, mo);
-    //rhf.roothan_hall();
+    // rhf.roothan_hall();
     rhf.solve_rhf();
 
     print_energies(mo);

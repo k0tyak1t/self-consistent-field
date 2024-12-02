@@ -22,7 +22,7 @@ void print_energies(const MOs& mo)
     std::cout << "\nTotal_energy = " << mo.get_total_energy() << '\n';
 }
 
-void display_progress(int progress, const std::string& leading_str) // TODO: fix behavior. (incorrect displaying of short data.)
+void display_progress(int progress, const std::string& leading_str)
 {
     int progress_bar_width = 30;
     int cursor_position = progress_bar_width * progress / 100;
@@ -31,11 +31,15 @@ void display_progress(int progress, const std::string& leading_str) // TODO: fix
         std::cout << (i <= cursor_position ? "█" : "▒");
         std::cout.flush();
     }
-    std::cout << " " << int(progress) << " %\r";
+    std::cout << " " << std::setw(5) << int(progress) << " %\r";
     std::cout.flush();
+
+    if (progress == 100) {
+        std::cout << std::endl;
+    }
 }
 
-double scalar_product(const std::vector<double>& vec_1, const std::vector<double>& vec_2)
+double dot_product(const std::vector<double>& vec_1, const std::vector<double>& vec_2)
 {
     if (vec_1.size() != vec_2.size()) {
         throw std::runtime_error("Failed to multiply vectors with different length!\n");

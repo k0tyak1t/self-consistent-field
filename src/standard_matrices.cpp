@@ -61,7 +61,8 @@ int standard_matrices::get_nAO() const
 double standard_matrices::get_Vee(int i, int j, int k, int l) const
 { // (ij|kl)
     if (((i < 0) || (i >= nAO)) || ((j < 0) || (j >= nAO)) || ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO))) {
-        std::cerr << " **ERROR*** numeration of indexes is wrong" << "  get_Vee " << '\n';
+        std::cerr << " **ERROR*** numeration of indexes is wrong"
+                  << "  get_Vee " << '\n';
         return 1;
     };
     return Vee[i + nAO * j + nAO * nAO * k + nAO * nAO * nAO * l];
@@ -70,7 +71,8 @@ double standard_matrices::get_Vee(int i, int j, int k, int l) const
 int standard_matrices::set_Vee(int i, int j, int k, int l, double a)
 { // (ij|kl)
     if (((i < 0) || (i >= nAO)) || ((j < 0) || (j >= nAO)) || ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO))) {
-        std::cerr << " **ERROR*** numeration of indexes is wrong" << "  set_Vee " << '\n';
+        std::cerr << " **ERROR*** numeration of indexes is wrong"
+                  << "  set_Vee " << '\n';
         return 1;
     };
     Vee[i + nAO * j + nAO * nAO * k + nAO * nAO * nAO * l] = a;
