@@ -115,7 +115,7 @@ void RHF::calculate_expansion()
 void RHF::calculate_diis_coefs()
 {
     // to be implemented!
-    for (double* i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
+    for (auto i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
         *i = 1 / diis_size;
     }
 }
