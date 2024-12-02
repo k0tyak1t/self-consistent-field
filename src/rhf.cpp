@@ -5,6 +5,7 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
+#include <deque>
 
 RHF::RHF(standard_matrices& std_m, MOs& mo)
     : etol(1e-12)
@@ -111,7 +112,10 @@ void RHF::calculate_expansion()
 
 void RHF::calculate_diis_coefs()
 {
-    // TODO: to be implemented
+    // to be implemented!
+    for (double& i: diis_coefs) {
+      i = 1 / diis_size;
+    }
 }
 
 void RHF::calculate_diis_fock()
@@ -130,20 +134,12 @@ void RHF::calculate_diis_error()
     }
 }
 
-void RHF::update_error_buffer()
+void RHF::update_buffer(std::deque<matrix>& buffer, matrix new_matrix)
 {
-    if ((int)error_buffer.size() == diis_size) {
-        error_buffer.pop_front();
-    }
-    error_buffer.push_back(error_matrix);
-}
-
-void RHF::update_fock_buffer()
-{
-    if ((int)fock_buffer.size() == diis_size) {
-        fock_buffer.pop_front();
-    }
-    fock_buffer.push_back(fock_matrix);
+  if ((int)(buffer.size()) == diis_size) {
+    buffer.pop_front();
+  }
+  buffer.push_back(new_matrix);
 }
 
 void RHF::calculate_pre_diis_error()
@@ -153,8 +149,8 @@ void RHF::calculate_pre_diis_error()
 
 void RHF::print_iteration()
 {
-    std::cout << "# "
-              << std::setw(5) << iter << std::setw(20)
+    std::cout << "#"
+              << std::setw(4) << iter << std::setw(18)
               << std::setprecision(12) << cur_energy + std_m.get_total_Vnn() << '\n';
 }
 
@@ -179,15 +175,19 @@ void RHF::solve_rhf()
         if (iter == diis_size) {
             std::cout << "-- DIIS approximation started --\n";
         }
-        iter < diis_size ? roothan_hall_step() : diis_step();
-        update_fock_buffer();
-        update_error_buffer();
+        //iter < diis_size ? roothan_hall_step() : diis_step();
+        roothan_hall_step();
+        //update_buffer(fock_buffer, fock_matrix);
+        //update_buffer(error_buffer, error_matrix);
         direct_iteration();
         iter++;
         print_iteration();
         validate_convergency();
         update_energy();
     }
+
+    std::cout << "\nTotal iterations = " << iter << '\n';
+    mo.set_total_energy(cur_energy + std_m.get_total_Vnn());
 }
 
 void RHF::roothan_hall_step()

@@ -31,7 +31,8 @@ int main(int argc, char** argv)
     }
 
     RHF rhf(sm, mo);
-    rhf.roothan_hall();
+    //rhf.roothan_hall();
+    rhf.solve_rhf();
 
     print_energies(mo);
     return 0;

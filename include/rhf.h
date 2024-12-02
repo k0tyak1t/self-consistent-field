@@ -15,12 +15,11 @@ public:
 	void validate_convergency();
   void print_iteration();
   void calculate_fock();
-  void calculate_pre_diis_error(); // to be implemented
-  void calculate_diis_coefs(); // to be implemented
-  void calculate_diis_fock(); // to be implemented
-  void calculate_diis_error(); // to be implemented
-  void update_fock_buffer(); // to be implemented
-  void update_error_buffer(); // to be implemented
+  void calculate_pre_diis_error();
+  void calculate_diis_coefs();
+  void calculate_diis_fock();
+  void calculate_diis_error();
+  void update_buffer(std::deque<matrix>&, matrix);
   void calculate_density();
   void calculate_eri_matrix();
   void update_energy();
