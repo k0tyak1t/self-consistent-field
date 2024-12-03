@@ -33,7 +33,7 @@ public:
     void operator()(int);
     double trace();
     friend double trace(const matrix&);
-    friend double frobenius_product(const matrix&, const matrix&);
+    friend double frobenius_product(matrix&, matrix&);
 
 private:
     int n;

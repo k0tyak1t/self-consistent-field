@@ -286,7 +286,7 @@ double trace(const matrix& mat)
   return result;
 }
 
-double frobenius_product(const matrix& mat1, const matrix& mat2)
+double frobenius_product(matrix& mat1, matrix& mat2)
 {
   return trace(mat1.T() * mat2);
 }
