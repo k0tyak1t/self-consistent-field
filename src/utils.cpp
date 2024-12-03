@@ -7,7 +7,8 @@
 
 void print_orbitals(const MO& mo)
 {
-    std::cout << "\n-- Orbitals --\n" << mo.C;
+    std::cout << "\n-- Orbitals --\n"
+              << mo.C;
 }
 
 void print_energies(const MO& mo)

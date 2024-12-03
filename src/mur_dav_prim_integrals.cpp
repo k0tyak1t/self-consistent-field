@@ -6,61 +6,91 @@ int MurDavPrimIntegrals::calcEijt(double* E, const int& imax, const int& jmax,
 {
     int tmax = imax + jmax + 1;
     double* Etmp = new double[tmax * tmax];
-    for (int i = 0; i < tmax * tmax; i++)
+
+    for (int i = 0; i < tmax * tmax; i++) {
         Etmp[i] = 0;
+    }
+
     Etmp[0] = exp(-mu * (xPA - xPB) * (xPA - xPB));
-    for (int i = 0; i < imax; i++)
+
+    for (int i = 0; i < imax; i++) {
         for (int t = 0; t <= i; t++) {
             Etmp[(i + 1) * tmax + t] += Etmp[i * tmax + t] * xPA;
             Etmp[(i + 1) * tmax + t + 1] += Etmp[i * tmax + t] * 0.5 / p;
             Etmp[(i + 1) * tmax + t - 1] += Etmp[i * tmax + t] * t;
-        };
-    for (int j = 0; j < jmax; j++)
+        }
+    }
+
+    for (int j = 0; j < jmax; j++) {
         for (int t = 0; t <= (j + imax); t++) {
             Etmp[(imax + j + 1) * tmax + t] += Etmp[(imax + j) * tmax + t] * xPB;
             Etmp[(imax + j + 1) * tmax + t + 1] += Etmp[(imax + j) * tmax + t] * 0.5 / p;
             Etmp[(imax + j + 1) * tmax + t - 1] += Etmp[(imax + j) * tmax + t] * t;
-        };
-    for (int t = 0; t < tmax; t++)
+        }
+    }
+
+    for (int t = 0; t < tmax; t++) {
         E[t] = Etmp[tmax * tmax - tmax + t];
+    }
+
     delete[] Etmp;
     return 0;
 }
 
-int MurDavPrimIntegrals::calcEij3(double& Eij, double& Eij2p, double& Eij2m,
-    const int& imax, const int& jmax,
-    const double& p, const double& mu, const double& xPA, const double& xPB)
+int MurDavPrimIntegrals::calcEij3(
+    double& Eij,
+    double& Eij2p,
+    double& Eij2m,
+    const int& imax,
+    const int& jmax,
+    const double& p,
+    const double& mu,
+    const double& xPA,
+    const double& xPB)
 {
+
     int tmax = imax + jmax + 3;
     double* Etmp = new double[tmax * tmax];
+
     for (int i = 0; i < tmax * tmax; i++)
         Etmp[i] = 0;
     Etmp[0] = exp(-mu * (xPA - xPB) * (xPA - xPB));
-    for (int i = 0; i < imax; i++)
+    for (int i = 0; i < imax; i++) {
         for (int t = 0; t <= i; t++) {
             Etmp[(i + 1) * tmax + t] += Etmp[i * tmax + t] * xPA;
             Etmp[(i + 1) * tmax + t + 1] += Etmp[i * tmax + t] * 0.5 / p;
             Etmp[(i + 1) * tmax + t - 1] += Etmp[i * tmax + t] * t;
-        };
-    for (int j = 0; j < jmax + 2; j++)
+        }
+    }
+    for (int j = 0; j < jmax + 2; j++) {
         for (int t = 0; t <= (j + imax); t++) {
             Etmp[(imax + j + 1) * tmax + t] += Etmp[(imax + j) * tmax + t] * xPB;
             Etmp[(imax + j + 1) * tmax + t + 1] += Etmp[(imax + j) * tmax + t] * 0.5 / p;
             Etmp[(imax + j + 1) * tmax + t - 1] += Etmp[(imax + j) * tmax + t] * t;
-        };
+        }
+    }
+
     Eij = Etmp[(tmax - 3) * tmax];
     Eij2p = Etmp[(tmax - 1) * tmax];
     Eij2m = 0;
-    if (jmax > 1)
+
+    if (jmax > 1) {
         Eij2m = Etmp[(tmax - 5) * tmax];
+    }
+
     delete[] Etmp;
     return 0;
 }
 
-int MurDavPrimIntegrals::calcRntuv(double* R,
-    const int& tmax, const int& umax, const int& vmax,
+int MurDavPrimIntegrals::calcRntuv(
+    double* R,
+    const int& tmax,
+    const int& umax,
+    const int& vmax,
     const double& p,
-    const double& xPA, const double& yPA, const double& zPA)
+    const double& xPA,
+    const double& yPA,
+    const double& zPA)
 {
     const int nmax = tmax + umax + vmax;
     const int ndim = (tmax + 1) * (umax + 1) * (vmax + 1);
@@ -75,10 +105,13 @@ int MurDavPrimIntegrals::calcRntuv(double* R,
         Fn[0] = erf(sqrt(x2)) * sqrt(acos(0.0) * 0.5 / x2);
         for (int n = 1; n < (nmax + 1); n++)
             Fn[n] = ((2 * n - 1) * Fn[n - 1] - exp(-x2)) * 0.5 / x2;
-    };
-    for (int n = 0; n <= nmax; n++)
+    }
+    for (int n = 0; n <= nmax; n++) {
         R[n * ndim] = pow(-2.0 * p, n) * Fn[n];
+    }
+
     delete[] Fn;
+
     int xR;
     if (tmax > 0) {
         for (int n = 0; n < nmax; n++)
@@ -89,6 +122,7 @@ int MurDavPrimIntegrals::calcRntuv(double* R,
                 R[xR - ndim + tdim] = xPA * R[xR] + t * R[xR - tdim];
             }
     }
+
     if (umax > 0) {
         for (int t = 0; t <= tmax; t++)
             for (int n = 0; n <= (nmax - t); n++)
@@ -98,21 +132,30 @@ int MurDavPrimIntegrals::calcRntuv(double* R,
                 for (int n = 0; n < nmax - t - u; n++) {
                     xR = (n + 1) * ndim + t * tdim + udim * u;
                     R[xR - ndim + udim] = yPA * R[xR] + u * R[xR - udim];
-                };
-    };
+                }
+    }
+
     if (vmax > 0) {
-        for (int t = 0; t <= tmax; t++)
-            for (int u = 0; u <= umax; u++)
-                for (int n = 0; n <= (nmax - t - u); n++)
+        for (int t = 0; t <= tmax; t++) {
+            for (int u = 0; u <= umax; u++) {
+                for (int n = 0; n <= (nmax - t - u); n++) {
                     R[n * ndim + t * tdim + u * udim + 1] = zPA * R[(n + 1) * ndim + t * tdim + u * udim];
-        for (int v = 1; v < vmax; v++)
-            for (int t = 0; t <= tmax; t++)
-                for (int u = 0; u <= umax; u++)
+                }
+            }
+        }
+
+        for (int v = 1; v < vmax; v++) {
+            for (int t = 0; t <= tmax; t++) {
+                for (int u = 0; u <= umax; u++) {
                     for (int n = 0; n < nmax - t - u - v; n++) {
                         xR = (n + 1) * ndim + t * tdim + udim * u + v;
                         R[xR - ndim + 1] = zPA * R[xR] + v * R[xR - 1];
-                    };
-    };
+                    }
+                }
+            }
+        }
+    }
+
     return 0;
 }
 
@@ -236,13 +279,21 @@ double MurDavPrimIntegrals::Vijkl(const int& nx1, const int& ny1, const int& nz1
     calcRntuv(Rntuv, tmax - 1, umax - 1, vmax - 1, al, xp - xq, yp - yq, zp - zq);
 
     double vt = 0;
-    for (int t1 = 0; t1 < t1max; t1++)
-        for (int u1 = 0; u1 < u1max; u1++)
-            for (int v1 = 0; v1 < v1max; v1++)
-                for (int t2 = 0; t2 < t2max; t2++)
-                    for (int u2 = 0; u2 < u2max; u2++)
-                        for (int v2 = 0; v2 < v2max; v2++)
-                            vt += E1ij[t1] * E1kl[u1] * E1mn[v1] * E2ij[t2] * E2kl[u2] * E2mn[v2] * Rntuv[(t1 + t2) * umax * vmax + (u2 + u1) * vmax + (v1 + v2)] * pow(-1, v2 + u2 + t2);
+    for (int t1 = 0; t1 < t1max; t1++) {
+        for (int u1 = 0; u1 < u1max; u1++) {
+            for (int v1 = 0; v1 < v1max; v1++) {
+                for (int t2 = 0; t2 < t2max; t2++) {
+                    for (int u2 = 0; u2 < u2max; u2++) {
+                        for (int v2 = 0; v2 < v2max; v2++) {
+                            vt += E1ij[t1] * E1kl[u1] * E1mn[v1] * E2ij[t2] * E2kl[u2]
+                                * E2mn[v2] * Rntuv[(t1 + t2) * umax * vmax + (u2 + u1)
+                                * vmax + (v1 + v2)] * pow(-1, v2 + u2 + t2);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     delete[] E1ij;
     delete[] E1kl;
@@ -251,5 +302,6 @@ double MurDavPrimIntegrals::Vijkl(const int& nx1, const int& ny1, const int& nz1
     delete[] E2kl;
     delete[] E2mn;
     delete[] Rntuv;
+
     return vt * 8 * acos(0.0) * acos(0.0) / p / q * sqrt(acos(0.0) * 2 / (p + q));
 }

@@ -65,7 +65,8 @@ int matrix::init(const int n_new)
     return 0;
 }
 
-std::ostream& operator<<(std::ostream& os, const matrix& mat) {
+std::ostream& operator<<(std::ostream& os, const matrix& mat)
+{
     for (int i = 0; i < mat.n; ++i) {
         for (int j = 0; j < mat.n; ++j) {
             os << mat[i][j] << " ";
@@ -75,7 +76,7 @@ std::ostream& operator<<(std::ostream& os, const matrix& mat) {
     return os;
 }
 
-int matrix::get_size() const {return n;}
+int matrix::get_size() const { return n; }
 
 double matrix::get_element(const int i, const int j) const
 {

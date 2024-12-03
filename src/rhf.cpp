@@ -126,11 +126,11 @@ void RHF::calculate_expansion()
 
 void RHF::calculate_error_product_matrix()
 {
-  for (int i = 0; i < diis_size; ++i) {
-    for (int j = 0; j < diis_size; ++j) {
-      error_product_matrix[i][j] = frobenius_product(error_buffer[i], error_buffer[j]);
+    for (int i = 0; i < diis_size; ++i) {
+        for (int j = 0; j < diis_size; ++j) {
+            error_product_matrix[i][j] = frobenius_product(error_buffer[i], error_buffer[j]);
+        }
     }
-  }
 }
 
 void RHF::calculate_diis_coefs()
@@ -140,7 +140,6 @@ void RHF::calculate_diis_coefs()
     for (auto i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
         *i = 1 / diis_size;
     }
-
 }
 
 void RHF::calculate_diis_fock()
