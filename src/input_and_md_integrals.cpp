@@ -91,9 +91,7 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
             double Sij = 0, Tij = 0, Vij = 0;
             for (vector<pair<int, SingleBasisFunction>>::iterator i1 = (*i).begin(); i1 != (*i).end(); i1++)
                 for (vector<pair<int, SingleBasisFunction>>::iterator j1 = (*j).begin(); j1 != (*j).end(); j1++) {
-                    double Sij_t = 0;
-                    double Tij_t = 0;
-                    double Vij_t = 0;
+                    double Sij_t = 0, Tij_t = 0, Vij_t = 0;
                     SingleBasisFunction f1 = (*i1).second;
                     SingleBasisFunction f2 = (*j1).second;
                     for (vector<pair<double, double>>::iterator i2 = f1.ai_ci.begin(); i2 != f1.ai_ci.end(); i2++)
@@ -115,10 +113,6 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
                     Tij += Tij_t * (*i1).first * (*j1).first;
                     Vij += Vij_t * (*i1).first * (*j1).first;
                 }
-            //A.S.set_element(ii, jj, Sij);
-            //A.T.set_element(ii, jj, Tij);
-            //A.Ven.set_element(ii, jj, -Vij);
-            //A.H.set_element(ii, jj, -Vij + Tij);
 
             A.S[ii][jj] = Sij;
             A.T[ii][jj] = Tij;
@@ -130,10 +124,10 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
     }
     //	расчет двуэлектронных интегралов
     ii = jj = kk = ll = 0;
+    const int ii_end = int(basisFunctions.size());
 
     unsigned char progress;
 
-    const int ii_end = int(basisFunctions.size());
     for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i = basisFunctions.begin(); i != basisFunctions.end(); i++) {
 
         jj = kk = ll = 0;
