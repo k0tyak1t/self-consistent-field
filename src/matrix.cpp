@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <ostream>
 
 matrix::matrix()
     : n(0)
@@ -64,17 +65,17 @@ int matrix::init(const int n_new)
     return 0;
 }
 
-int matrix::print() const
-{
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j)
-            std::cout << std::setw(10) << std::setprecision(6) << _matrix_elements[i * n + j] << ' ';
-        std::cout << '\n';
+std::ostream& operator<<(std::ostream& os, const matrix& mat) {
+    for (int i = 0; i < mat.n; ++i) {
+        for (int j = 0; j < mat.n; ++j) {
+            os << mat[i][j] << " ";
+        }
+        os << '\n';
     }
-    return 0;
+    return os;
 }
 
-int matrix::get_size() const { return n; }
+int matrix::get_size() const {return n;}
 
 double matrix::get_element(const int i, const int j) const
 {

@@ -115,10 +115,15 @@ bool InputAndMDIntegrals::calc(standard_matrices& A)
                     Tij += Tij_t * (*i1).first * (*j1).first;
                     Vij += Vij_t * (*i1).first * (*j1).first;
                 }
-            A.S.set_element(ii, jj, Sij);
-            A.T.set_element(ii, jj, Tij);
-            A.Ven.set_element(ii, jj, -Vij);
-            A.H.set_element(ii, jj, -Vij + Tij);
+            //A.S.set_element(ii, jj, Sij);
+            //A.T.set_element(ii, jj, Tij);
+            //A.Ven.set_element(ii, jj, -Vij);
+            //A.H.set_element(ii, jj, -Vij + Tij);
+
+            A.S[ii][jj] = Sij;
+            A.T[ii][jj] = Tij;
+            A.Ven[ii][jj] = -Vij;
+            A.H[ii][jj] = Tij - Vij;
             jj++;
         }
         ii++;

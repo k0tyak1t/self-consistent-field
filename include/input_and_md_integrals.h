@@ -37,7 +37,7 @@ private:
         double x, y, z;
         int q;
     };
-    std::vector<Atom> atoms;
+    vector<Atom> atoms;
     map<int, vector<pair<int, vector<pair<double, double>>>>> basisLib;
     vector<vector<pair<int, SingleBasisFunction>>> basisFunctions;
 };

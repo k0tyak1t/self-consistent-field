@@ -1,5 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
+#include <ostream>
+
 class matrix {
 public:
     matrix();
@@ -19,7 +21,7 @@ public:
     void from_array(const double*);
     int set_row(const int, const double*); // legacy
     int set_element(const int, const int, const double); // legacy
-    int print() const; // TODO: change return type.
+    friend std::ostream& operator<<(std::ostream&, const matrix&);
     void zeroize();
     // matrix zero_like(const matrix&); // TODO: implement.
     matrix operator+(const matrix&);

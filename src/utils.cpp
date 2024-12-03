@@ -1,13 +1,14 @@
 #include "utils.h"
 #include <iomanip>
 #include <iostream>
+#include <ostream>
 #include <string>
 #include <vector>
 
 void print_orbitals(const MO& mo)
 {
-    std::cout << "\n-- Orbitals --\n";
-    mo.C.print();
+    std::cout << "\n-- Orbitals --\n" << mo.C;
+    //mo.C.print();
 }
 
 void print_energies(const MO& mo)
