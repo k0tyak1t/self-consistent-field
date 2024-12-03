@@ -17,7 +17,7 @@ bool InputAndMDIntegrals::readGeom(char* filename)
     Atom atomTmp;
     double x, y, z;
     while (inp >> tmp_str >> x >> y >> z) {
-        atomTmp.q = get_Z(tmp_str);
+        atomTmp.q = get_nuclear_charge(tmp_str);
         atomTmp.x = x;
         atomTmp.y = y;
         atomTmp.z = z;
@@ -45,19 +45,19 @@ bool InputAndMDIntegrals::readBasisLib(char* filename)
     inp >> tmp_str;
 
     while (true) {
-        idAtom = get_Z(tmp_str);
+        idAtom = get_nuclear_charge(tmp_str);
         if (idAtom < 1)
             return false;
         singleAtomBL.clear();
         inp >> tmp_str;
-        while (get_L(tmp_str) >= 0) {
+        while (get_orbital_momentum(tmp_str) >= 0) {
             inp >> nFunc;
             singleBF.clear();
             for (int i = 0; i < nFunc; i++) {
                 inp >> tmp_int >> a >> C;
                 singleBF.push_back(make_pair(a, C));
             }
-            singleAtomBL.push_back(make_pair(get_L(tmp_str), singleBF));
+            singleAtomBL.push_back(make_pair(get_orbital_momentum(tmp_str), singleBF));
             if (!(inp >> tmp_str)) {
                 inp.close();
                 basisLib[idAtom] = singleAtomBL;
@@ -345,7 +345,7 @@ bool InputAndMDIntegrals::makeBasis()
     return true;
 }
 
-int InputAndMDIntegrals::get_Z(const string& str_) const
+int InputAndMDIntegrals::get_nuclear_charge(const string& str_) const
 {
     string str(str_);
     transform(str.begin(), str.end(), str.begin(), toupper);
@@ -373,7 +373,7 @@ int InputAndMDIntegrals::get_Z(const string& str_) const
     return 0;
 }
 
-int InputAndMDIntegrals::get_L(const string& str_) const
+int InputAndMDIntegrals::get_orbital_momentum(const string& str_) const
 {
     string str(str_);
     transform(str.begin(), str.end(), str.begin(), toupper);

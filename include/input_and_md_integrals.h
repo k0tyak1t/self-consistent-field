@@ -27,13 +27,12 @@ public:
     bool calc(standard_matrices&);
     bool makeBasis();
     void printBasis();
-    void test() const;
     bool set_c2v_z(int*);
 
 private:
     double calcVnn();
-    int get_Z(const std::string&) const;
-    int get_L(const std::string&) const;
+    int get_nuclear_charge(const std::string&) const;
+    int get_orbital_momentum(const std::string&) const;
     struct Atom {
         double x, y, z;
         int q;
