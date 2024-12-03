@@ -185,8 +185,8 @@ void RHF::solve_rhf()
             std::cout << "-- DIIS approximation started --\n";
         }
         // iter < diis_size ? roothan_hall_step() : diis_step(); // should be uncommented when diis implemented
-        update_buffer(fock_buffer, fock_matrix);
-        update_buffer(error_buffer, error_matrix);
+        //update_buffer(fock_buffer, fock_matrix);
+        //update_buffer(error_buffer, error_matrix);
         common_step();
     }
 
