@@ -13,7 +13,6 @@ public:
     int set_mo_energy(const int, const double);
     int set_total_energy(const double);
     double get_total_energy() const;
-    double check_ij(const int, const int, const char*) const;
     int get_irrep(const int&) const;
     bool set_c2v(int* symmAO, const double& limit);
     void set_mo_energies(const double*);

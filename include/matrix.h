@@ -13,7 +13,6 @@ public:
     int eigen_vv(double*, double*);
     int init(const int n); // TODO: deprecate.
     int get_size() const;
-    int check_ij(const int, const int, const char*) const; // legacy
     int get_matrix_elements(double*) const; // legacy
     int get_row(const int, double*) const; // legacy
     double get_element(const int, const int) const; // legacy

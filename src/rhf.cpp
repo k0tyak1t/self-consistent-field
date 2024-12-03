@@ -140,6 +140,7 @@ void RHF::calculate_diis_coefs()
     for (auto i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
         *i = 1 / diis_size;
     }
+
 }
 
 void RHF::calculate_diis_fock()

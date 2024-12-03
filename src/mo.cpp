@@ -33,23 +33,6 @@ int MOs::get_size()
     return n;
 }
 
-double MOs::check_ij(const int i, const int j, const char* name) const
-{
-    if (n == 0) {
-        std::cerr << "** ERROR *** array not defined in " << name << '\n';
-        return 1;
-    };
-    if ((i < 0) || (i > n - 1)) {
-        std::cerr << "** ERROR *** invalid number of string in " << name << '\n';
-        return 1;
-    };
-    if ((j < 0) || (j > n - 1)) {
-        std::cerr << "** ERROR *** invalid number of element in " << name << '\n';
-        return 1;
-    };
-    return 0;
-}
-
 double MOs::get_mo_energy(const int i) const
 {
     return mo_energies[i];

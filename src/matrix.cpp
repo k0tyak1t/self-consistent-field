@@ -76,37 +76,13 @@ int matrix::print() const
 
 int matrix::get_size() const { return n; }
 
-int matrix::check_ij(const int i, const int j, const char* name) const
-{
-    if (n == 0) {
-        std::cerr << "** ERROR *** array not defined in " << name << '\n';
-        return 1;
-    }
-
-    if ((i < 0) || (i > n - 1)) {
-        std::cerr << "** ERROR *** invalid number of string in " << name << '\n';
-        return 1;
-    }
-
-    if ((j < 0) || (j > n - 1)) {
-        std::cerr << "** ERROR *** invalid number of element in " << name << '\n';
-        return 1;
-    }
-
-    return 0;
-}
-
 double matrix::get_element(const int i, const int j) const
 {
-    if (check_ij(i, j, "get_element") > 0)
-        return 1;
     return _matrix_elements[i * n + j];
 }
 
 int matrix::get_row(const int i, double* a) const
 {
-    if (check_ij(i, 0, "get_row") > 0)
-        return 1;
     for (int j = 0; j < n; j++)
         a[j] = _matrix_elements[i * n + j];
     return 0;
@@ -127,16 +103,12 @@ int matrix::get_matrix_elements(double* a) const
 
 int matrix::set_element(const int i, const int j, const double aij)
 {
-    if (check_ij(i, j, "set_element") > 0)
-        return 1;
     _matrix_elements[i * n + j] = aij;
     return 0;
 }
 
 int matrix::set_row(const int i, const double* a)
 {
-    if (check_ij(i, 0, "set_row") > 0)
-        return 1;
     for (int j = 0; j < n; j++)
         _matrix_elements[i * n + j] = a[j];
     return 0;
