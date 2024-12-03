@@ -139,6 +139,7 @@ void RHF::calculate_diis_error()
 void RHF::update_buffer(std::deque<matrix>& buffer, matrix new_matrix)
 {
     if ((int)(buffer.size()) == diis_size) {
+        buffer.front().~matrix();
         buffer.pop_front();
     }
     buffer.push_back(new_matrix);
@@ -184,8 +185,8 @@ void RHF::solve_rhf()
             std::cout << "-- DIIS approximation started --\n";
         }
         // iter < diis_size ? roothan_hall_step() : diis_step(); // should be uncommented when diis implemented
-        // update_buffer(fock_buffer, fock_matrix);
-        // update_buffer(error_buffer, error_matrix);
+        update_buffer(fock_buffer, fock_matrix);
+        update_buffer(error_buffer, error_matrix);
         common_step();
     }
 

@@ -267,3 +267,27 @@ void matrix::operator()(int new_size)
     n = new_size;
     _matrix_elements = new double[n * n];
 }
+
+double matrix::trace()
+{
+  double result = 0;
+  for (int i = 0; i < n; ++i) {
+    result += _matrix_elements[i * (1 + n)];
+  }
+  return result;
+}
+
+double trace(const matrix& mat)
+{
+  double result = 0;
+  for (int i = 0; i < mat.n; ++i) {
+    result += mat[i][i];
+  }
+  return result;
+}
+
+double frobenius_product(const matrix& mat1, const matrix& mat2)
+{
+  return trace(mat1.T() * mat2);
+}
+
