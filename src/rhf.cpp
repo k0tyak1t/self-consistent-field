@@ -24,6 +24,7 @@ RHF::RHF(standard_matrices& std_m, MOs& mo)
     density(std_m.get_nAO());
     eri_matrix(std_m.get_nAO());
     fock_matrix(std_m.get_nAO());
+    error_product_matrix(diis_size + 1);
     init_error_product_matrix();
 
     std::cout << "\n-- Running SCF procedure --\n"
@@ -38,9 +39,8 @@ RHF::~RHF()
     delete[] evec;
 }
 
-void init_error_product_matrix()
+void RHF::init_error_product_matrix()
 {
-    error_product_matrix(diis_size + 1);
 
     for (int i = 0; i < diis_size + 1; ++i) {
         error_product_matrix[i][diis_size] = -1;
@@ -124,18 +124,18 @@ void RHF::calculate_expansion()
     mo.C = std_m.X * mo.C.T();
 }
 
-void calculate_error_product_matrix()
+void RHF::calculate_error_product_matrix()
 {
   for (int i = 0; i < diis_size; ++i) {
     for (int j = 0; j < diis_size; ++j) {
-      error_product_matrix[i][j] = frobenius_product(error[i], error[j]);
+      error_product_matrix[i][j] = frobenius_product(error_buffer[i], error_buffer[j]);
     }
   }
 }
 
 void RHF::calculate_diis_coefs()
 {
-    // TODO: implement properly, following code it's just placeholder!!!
+    // TODO: implement protperly, following code it's just placeholder!!!
 
     for (auto i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
         *i = 1 / diis_size;
