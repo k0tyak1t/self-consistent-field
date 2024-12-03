@@ -24,7 +24,7 @@ RHF::RHF(standard_matrices& std_m, MOs& mo)
     density(std_m.get_nAO());
     eri_matrix(std_m.get_nAO());
     fock_matrix(std_m.get_nAO());
-    error_product_matrix(diis_size);
+    init_error_product_matrix();
 
     std::cout << "\n-- Running SCF procedure --\n"
               << "Electrons: " << std_m.get_num_el() << std::endl
@@ -36,6 +36,18 @@ RHF::~RHF()
 {
     delete[] mo_energies;
     delete[] evec;
+}
+
+void init_error_product_matrix()
+{
+    error_product_matrix(diis_size + 1);
+
+    for (int i = 0; i < diis_size + 1; ++i) {
+        error_product_matrix[i][diis_size] = -1;
+        error_product_matrix[diis_size][i] = -1;
+    }
+
+    error_product_matrix[diis_size][diis_size] = 0;
 }
 
 bool RHF::get_convergency()
@@ -112,9 +124,19 @@ void RHF::calculate_expansion()
     mo.C = std_m.X * mo.C.T();
 }
 
+void calculate_error_product_matrix()
+{
+  for (int i = 0; i < diis_size; ++i) {
+    for (int j = 0; j < diis_size; ++j) {
+      error_product_matrix[i][j] = frobenius_product(error[i], error[j]);
+    }
+  }
+}
+
 void RHF::calculate_diis_coefs()
 {
-    // to be implemented!
+    // TODO: implement properly, following code it's just placeholder!!!
+
     for (auto i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
         *i = 1 / diis_size;
     }
@@ -185,8 +207,8 @@ void RHF::solve_rhf()
             std::cout << "-- DIIS approximation started --\n";
         }
         // iter < diis_size ? roothan_hall_step() : diis_step(); // should be uncommented when diis implemented
-        //update_buffer(fock_buffer, fock_matrix);
-        //update_buffer(error_buffer, error_matrix);
+        // update_buffer(fock_buffer, fock_matrix);
+        // update_buffer(error_buffer, error_matrix);
         common_step();
     }
 
@@ -204,6 +226,7 @@ void RHF::roothan_hall_step()
 
 void RHF::diis_step()
 {
+    calculate_error_product_matrix();
     calculate_diis_coefs();
     calculate_diis_fock();
     calculate_diis_error();

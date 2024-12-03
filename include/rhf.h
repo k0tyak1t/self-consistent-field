@@ -10,6 +10,7 @@ class RHF {
 public:
     RHF(standard_matrices&, MOs&);
     ~RHF();
+    void init_error_product_matrix();
     bool get_convergency();
     matrix transform_matrix(const matrix&);
     void validate_convergency();

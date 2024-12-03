@@ -270,24 +270,23 @@ void matrix::operator()(int new_size)
 
 double matrix::trace()
 {
-  double result = 0;
-  for (int i = 0; i < n; ++i) {
-    result += _matrix_elements[i * (1 + n)];
-  }
-  return result;
+    double result = 0;
+    for (int i = 0; i < n; ++i) {
+        result += _matrix_elements[i * (1 + n)];
+    }
+    return result;
 }
 
 double trace(const matrix& mat)
 {
-  double result = 0;
-  for (int i = 0; i < mat.n; ++i) {
-    result += mat[i][i];
-  }
-  return result;
+    double result = 0;
+    for (int i = 0; i < mat.n; ++i) {
+        result += mat[i][i];
+    }
+    return result;
 }
 
 double frobenius_product(matrix& mat1, matrix& mat2)
 {
-  return trace(mat1.T() * mat2);
+    return trace(mat1.T() * mat2);
 }
-
