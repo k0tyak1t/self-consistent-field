@@ -3,12 +3,12 @@
 #include <cstring>
 #include <iostream>
 
-MOs::MOs()
+MO::MO()
     : n(0)
 {
 }
 
-MOs::~MOs()
+MO::~MO()
 {
     if (n > 0) {
         delete[] mo_energies;
@@ -16,7 +16,7 @@ MOs::~MOs()
     }
 }
 
-int MOs::init(const int n_new)
+int MO::init(const int n_new)
 {
     if (n > 0) {
         throw std::runtime_error("Object Cl2 already have size!\n");
@@ -28,39 +28,39 @@ int MOs::init(const int n_new)
     return 0;
 }
 
-int MOs::get_size()
+int MO::get_size()
 {
     return n;
 }
 
-double MOs::get_mo_energy(const int i) const
+double MO::get_mo_energy(const int i) const
 {
     return mo_energies[i];
 }
 
-int MOs::get_irrep(const int& i) const
+int MO::get_irrep_characters(const int& i) const
 {
     return irrep[i];
 }
 
-int MOs::set_mo_energy(const int i, const double energy_i)
+int MO::set_mo_energy(const int i, const double energy_i)
 {
     mo_energies[i] = energy_i;
     return 0;
 }
 
-int MOs::set_total_energy(const double new_total_energy)
+int MO::set_total_energy(const double new_total_energy)
 {
     total_energy = new_total_energy;
     return 0;
 }
 
-double MOs::get_total_energy() const
+double MO::get_total_energy() const
 {
     return total_energy;
 }
 
-bool MOs::set_c2v(int* symmAO, const double& limit)
+bool MO::set_c2v(int* symmAO, const double& limit)
 {
     if (n == 0) {
         throw std::runtime_error("Failed to set undifined MO symmetry!\n");
@@ -79,7 +79,7 @@ bool MOs::set_c2v(int* symmAO, const double& limit)
     return true;
 }
 
-void MOs::set_mo_energies(const double* new_mo_energies)
+void MO::set_mo_energies(const double* new_mo_energies)
 {
     memcpy(mo_energies, new_mo_energies, n * sizeof(double));
 }

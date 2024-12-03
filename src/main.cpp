@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 
     standard_matrices sm;
     InputAndMDIntegrals loader;
-    MOs mo;
+    MO mo;
 
     std::cout << "-- Preparing --\n";
     if (!loader.readGeom(mol_name) || !loader.readBasisLib(basis)) {

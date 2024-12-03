@@ -8,7 +8,7 @@
 
 class RHF {
 public:
-    RHF(standard_matrices&, MOs&);
+    RHF(standard_matrices&, MO&);
     ~RHF();
     void init_error_product_matrix();
     bool get_convergency();
@@ -37,7 +37,7 @@ private:
     int max_iter, diis_size, iter;
     bool is_converged;
     standard_matrices& std_m;
-    MOs& mo;
+    MO& mo;
     double prev_energy, cur_energy;
     double* evec;
     double* mo_energies;

@@ -2,10 +2,10 @@
 #define MOS_H
 #include "matrix.h"
 
-class MOs {
+class MO {
 public:
-    MOs();
-    ~MOs();
+    MO();
+    ~MO();
     matrix C; // MO to AO expansion. MO in columns
     int init(const int);
     double get_mo_energy(const int) const;
@@ -13,7 +13,7 @@ public:
     int set_mo_energy(const int, const double);
     int set_total_energy(const double);
     double get_total_energy() const;
-    int get_irrep(const int&) const;
+    int get_irrep_characters(const int&) const;
     bool set_c2v(int* symmAO, const double& limit);
     void set_mo_energies(const double*);
 

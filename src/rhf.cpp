@@ -8,7 +8,7 @@
 #include <iomanip>
 #include <iostream>
 
-RHF::RHF(standard_matrices& std_m, MOs& mo)
+RHF::RHF(standard_matrices& std_m, MO& mo)
     : etol(1e-12)
     , max_iter(100)
     , iter(0)

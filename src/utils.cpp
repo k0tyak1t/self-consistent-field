@@ -4,13 +4,13 @@
 #include <string>
 #include <vector>
 
-void print_orbitals(const MOs& mo)
+void print_orbitals(const MO& mo)
 {
     std::cout << "\n-- Orbitals --\n";
     mo.C.print();
 }
 
-void print_energies(const MOs& mo)
+void print_energies(const MO& mo)
 {
     std::cout << "\n-- Final energies --\n";
     int nAO = mo.C.get_size();
