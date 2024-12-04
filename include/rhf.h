@@ -21,6 +21,7 @@ public:
     void calculate_diis_coefs();
     void calculate_diis_fock();
     void calculate_diis_error();
+    void verify_buffer(std::deque<matrix>&);
     void update_buffer(std::deque<matrix>&, matrix);
     void calculate_density();
     void calculate_eri_matrix();
