@@ -2,7 +2,8 @@
 #include <boost/math/special_functions/erf.hpp>
 
 int MurDavPrimIntegrals::calcEijt(double* E, const int& imax, const int& jmax,
-    const double& p, const double& mu, const double& xPA, const double& xPB)
+    const double& p, const double& mu,
+    const double& xPA, const double& xPB)
 {
     int tmax = imax + jmax + 1;
     double* Etmp = new double[tmax * tmax];
@@ -37,16 +38,10 @@ int MurDavPrimIntegrals::calcEijt(double* E, const int& imax, const int& jmax,
     return 0;
 }
 
-int MurDavPrimIntegrals::calcEij3(
-    double& Eij,
-    double& Eij2p,
-    double& Eij2m,
-    const int& imax,
-    const int& jmax,
-    const double& p,
-    const double& mu,
-    const double& xPA,
-    const double& xPB)
+int MurDavPrimIntegrals::calcEij3(double& Eij, double& Eij2p, double& Eij2m,
+    const int& imax, const int& jmax,
+    const double& p, const double& mu,
+    const double& xPA, const double& xPB)
 {
 
     int tmax = imax + jmax + 3;
@@ -82,14 +77,9 @@ int MurDavPrimIntegrals::calcEij3(
     return 0;
 }
 
-int MurDavPrimIntegrals::calcRntuv(
-    double* R,
-    const int& tmax,
-    const int& umax,
-    const int& vmax,
-    const double& p,
-    const double& xPA,
-    const double& yPA,
+int MurDavPrimIntegrals::calcRntuv(double* R, const int& tmax, const int& umax,
+    const int& vmax, const double& p,
+    const double& xPA, const double& yPA,
     const double& zPA)
 {
     const int nmax = tmax + umax + vmax;
@@ -159,8 +149,12 @@ int MurDavPrimIntegrals::calcRntuv(
     return 0;
 }
 
-double MurDavPrimIntegrals::Sij(const int& nx1, const int& ny1, const int& nz1, const double& x1, const double& y1, const double& z1, const double& alpha1,
-    const int& nx2, const int& ny2, const int& nz2, const double& x2, const double& y2, const double& z2, const double& alpha2)
+double MurDavPrimIntegrals::Sij(const int& nx1, const int& ny1, const int& nz1,
+    const double& x1, const double& y1,
+    const double& z1, const double& alpha1,
+    const int& nx2, const int& ny2, const int& nz2,
+    const double& x2, const double& y2,
+    const double& z2, const double& alpha2)
 {
     const double p = alpha1 + alpha2;
     const double mu = alpha1 * alpha2 / p;
@@ -180,8 +174,12 @@ double MurDavPrimIntegrals::Sij(const int& nx1, const int& ny1, const int& nz1, 
     return S;
 }
 
-double MurDavPrimIntegrals::Tij(const int& nx1, const int& ny1, const int& nz1, const double& x1, const double& y1, const double& z1, const double& alpha1,
-    const int& nx2, const int& ny2, const int& nz2, const double& x2, const double& y2, const double& z2, const double& alpha2)
+double MurDavPrimIntegrals::Tij(const int& nx1, const int& ny1, const int& nz1,
+    const double& x1, const double& y1,
+    const double& z1, const double& alpha1,
+    const int& nx2, const int& ny2, const int& nz2,
+    const double& x2, const double& y2,
+    const double& z2, const double& alpha2)
 {
     const double p = alpha1 + alpha2;
     const double mu = alpha1 * alpha2 / p;
@@ -197,9 +195,14 @@ double MurDavPrimIntegrals::Tij(const int& nx1, const int& ny1, const int& nz1, 
     double T_mn = -2 * alpha2 * alpha2 * S_mn2p + alpha2 * (2 * nz2 + 1) * S_mn - 0.5 * nz2 * (nz2 - 1) * S_mn2m;
     return (T_ij * S_kl * S_mn + S_ij * T_kl * S_mn + S_ij * S_kl * T_mn) * pow(acos(0.0) * 2.0 / p, 1.5);
 }
-double MurDavPrimIntegrals::Vij(const int& nx1, const int& ny1, const int& nz1, const double& x1, const double& y1, const double& z1, const double& alpha1,
-    const int& nx2, const int& ny2, const int& nz2, const double& x2, const double& y2, const double& z2, const double& alpha2,
-    const double& xq, const double& yq, const double& zq)
+double MurDavPrimIntegrals::Vij(const int& nx1, const int& ny1, const int& nz1,
+    const double& x1, const double& y1,
+    const double& z1, const double& alpha1,
+    const int& nx2, const int& ny2, const int& nz2,
+    const double& x2, const double& y2,
+    const double& z2, const double& alpha2,
+    const double& xq, const double& yq,
+    const double& zq)
 {
     const double p = alpha1 + alpha2;
     const double mu = alpha1 * alpha2 / p;
@@ -234,10 +237,15 @@ double MurDavPrimIntegrals::Vij(const int& nx1, const int& ny1, const int& nz1, 
     return vt * acos(0.0) * 4.0 / p;
 }
 
-double MurDavPrimIntegrals::Vijkl(const int& nx1, const int& ny1, const int& nz1, const double& x1, const double& y1, const double& z1, const double& alpha1,
-    const int& nx2, const int& ny2, const int& nz2, const double& x2, const double& y2, const double& z2, const double& alpha2,
-    const int& nx3, const int& ny3, const int& nz3, const double& x3, const double& y3, const double& z3, const double& alpha3,
-    const int& nx4, const int& ny4, const int& nz4, const double& x4, const double& y4, const double& z4, const double& alpha4)
+double MurDavPrimIntegrals::Vijkl(
+    const int& nx1, const int& ny1, const int& nz1, const double& x1,
+    const double& y1, const double& z1, const double& alpha1, const int& nx2,
+    const int& ny2, const int& nz2, const double& x2, const double& y2,
+    const double& z2, const double& alpha2, const int& nx3, const int& ny3,
+    const int& nz3, const double& x3, const double& y3, const double& z3,
+    const double& alpha3, const int& nx4, const int& ny4, const int& nz4,
+    const double& x4, const double& y4, const double& z4,
+    const double& alpha4)
 {
     const double p = alpha1 + alpha2;
     const double mup = alpha1 * alpha2 / p;
@@ -285,9 +293,7 @@ double MurDavPrimIntegrals::Vijkl(const int& nx1, const int& ny1, const int& nz1
                 for (int t2 = 0; t2 < t2max; t2++) {
                     for (int u2 = 0; u2 < u2max; u2++) {
                         for (int v2 = 0; v2 < v2max; v2++) {
-                            vt += E1ij[t1] * E1kl[u1] * E1mn[v1] * E2ij[t2] * E2kl[u2]
-                                * E2mn[v2] * Rntuv[(t1 + t2) * umax * vmax + (u2 + u1)
-                                * vmax + (v1 + v2)] * pow(-1, v2 + u2 + t2);
+                            vt += E1ij[t1] * E1kl[u1] * E1mn[v1] * E2ij[t2] * E2kl[u2] * E2mn[v2] * Rntuv[(t1 + t2) * umax * vmax + (u2 + u1) * vmax + (v1 + v2)] * pow(-1, v2 + u2 + t2);
                         }
                     }
                 }

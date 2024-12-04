@@ -3,9 +3,7 @@
 #include "rhf.h"
 #include "standard_matrices.h"
 #include "utils.h"
-#include <iomanip>
 #include <iostream>
-#include <string>
 
 int main(int argc, char** argv)
 {
