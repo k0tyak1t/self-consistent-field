@@ -1,0 +1,47 @@
+[
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/input_and_md_integrals.cpp.o -c /root/code/diis/src/input_and_md_integrals.cpp",
+  "file": "/root/code/diis/src/input_and_md_integrals.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/main.cpp.o -c /root/code/diis/src/main.cpp",
+  "file": "/root/code/diis/src/main.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/matrix.cpp.o -c /root/code/diis/src/matrix.cpp",
+  "file": "/root/code/diis/src/matrix.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/mo.cpp.o -c /root/code/diis/src/mo.cpp",
+  "file": "/root/code/diis/src/mo.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/mur_dav_prim_integrals.cpp.o -c /root/code/diis/src/mur_dav_prim_integrals.cpp",
+  "file": "/root/code/diis/src/mur_dav_prim_integrals.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/rhf.cpp.o -c /root/code/diis/src/rhf.cpp",
+  "file": "/root/code/diis/src/rhf.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/single_basis_functiton.cpp.o -c /root/code/diis/src/single_basis_functiton.cpp",
+  "file": "/root/code/diis/src/single_basis_functiton.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/standard_matrices.cpp.o -c /root/code/diis/src/standard_matrices.cpp",
+  "file": "/root/code/diis/src/standard_matrices.cpp"
+},
+{
+  "directory": "/root/code/diis/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_MATH_C99_DYN_LINK -I/root/code/diis/include -Wall -Wextra -pedantic -Werror -std=gnu++17 -o CMakeFiles/scf.dir/src/utils.cpp.o -c /root/code/diis/src/utils.cpp",
+  "file": "/root/code/diis/src/utils.cpp"
+}
+]

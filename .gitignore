@@ -1,0 +1,11 @@
+build/
+compiled/
+scf
+scf.pub
+*.out
+*.exe
+
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
