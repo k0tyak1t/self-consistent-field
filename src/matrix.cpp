@@ -35,8 +35,8 @@ void matrix::zeroize() {
 
 int matrix::init(const int n_new) {
   if (n > 0) {
-    throw std::runtime_error("** ERROR *** object Cl2 yet have n\n");
-  };
+    throw std::runtime_error("Matrix already initialized.\n");
+  }
   n = n_new;
   _matrix_elements = new double[n * n];
   return 0;
@@ -50,6 +50,15 @@ std::ostream &operator<<(std::ostream &os, const matrix &mat) {
     os << '\n';
   }
   return os;
+}
+
+matrix matrix::zero_like(const matrix &other) {
+  matrix result = other;
+  for (int i = 0; i < n * n; ++i) {
+    _matrix_elements[i] = 0;
+  }
+
+  return result;
 }
 
 int matrix::get_size() const { return n; }
@@ -93,8 +102,7 @@ void matrix::eigen_vv(double *evec, double *eval) {
         "Failed to get eigensystem of undefined matrix!\n");
   }
   lwork = 3 * n;
-  double *work;
-  work = new double[3 * n];
+  double *work = new double[3 * n];
   get_matrix_elements(evec);
   jobz = 'V';
   uplo = 'U';
