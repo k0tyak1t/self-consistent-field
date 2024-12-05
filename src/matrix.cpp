@@ -9,7 +9,6 @@ matrix::matrix() : n(0), _matrix_elements(nullptr) {}
 matrix::matrix(int n_new) : n(n_new) { _matrix_elements = new double[n * n]; }
 
 matrix::matrix(const matrix &other) {
-  std::cout << "copy" << std::endl;
   n = other.n;
   _matrix_elements = new double[n * n];
   memcpy(_matrix_elements, other._matrix_elements, n * n * sizeof(double));
@@ -20,10 +19,7 @@ matrix::matrix(int init_size, double const *init_arr) : n(init_size) {
   memcpy(_matrix_elements, init_arr, n * n * sizeof(double));
 }
 
-matrix::~matrix() {
-  std::cout << "destructed" << std::endl;
-  delete[] _matrix_elements;
-}
+matrix::~matrix() { delete[] _matrix_elements; }
 
 double *matrix::operator[](int row) { return &_matrix_elements[row * n]; }
 
@@ -109,21 +105,18 @@ void matrix::eigen_vv(double *evec, double *eval) {
   delete[] work;
 }
 
-matrix matrix::operator+(const matrix &other) {
-  matrix result(n);
-  for (int i = 0; i < n * n; ++i) {
-    result._matrix_elements[i] =
-        _matrix_elements[i] + other._matrix_elements[i];
-  }
-  return result;
-}
-
 matrix &matrix::operator+=(const matrix &other) {
   for (int i = 0; i < n * n; ++i) {
     _matrix_elements[i] += other._matrix_elements[i];
   }
 
   return *this;
+}
+
+matrix matrix::operator+(const matrix &other) {
+  matrix result = *this;
+  result += other;
+  return result;
 }
 
 matrix matrix::operator-(const matrix &other) {

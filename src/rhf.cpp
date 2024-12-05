@@ -28,16 +28,6 @@ RHF::RHF(standard_matrices &std_m, MO &mo)
 RHF::~RHF() {
   delete[] mo_energies;
   delete[] evec;
-
-  for (; !fock_buffer.empty();) {
-    fock_buffer.front().~matrix();
-    fock_buffer.pop_front();
-  }
-
-  for (; !error_buffer.empty();) {
-    error_buffer.front().~matrix();
-    fock_buffer.pop_front();
-  }
 }
 
 void RHF::init_error_product_matrix() {
@@ -153,7 +143,6 @@ void RHF::verify_buffer(std::deque<matrix> &buffer) {
 
 void RHF::update_buffer(std::deque<matrix> &buffer, matrix new_matrix) {
 
-  std::cout << "AAA" << std::endl;
   verify_buffer(buffer);
   buffer.push_back(new_matrix);
 }
