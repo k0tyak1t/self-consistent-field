@@ -13,7 +13,7 @@ public:
     const double* operator[](int) const;
     matrix T();
     void eigen_vv(double*, double*);
-    matrix inverse(const matrix&); // TODO: to be implemented.
+    matrix inv(const matrix&); // TODO: to be implemented.
     int init(const int n); // TODO: deprecate.
     int get_size() const;
     void get_matrix_elements(double*);
