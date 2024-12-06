@@ -1,26 +1,29 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 #include <ostream>
+#include <initializer_list>
 
 class matrix {
 public:
     matrix();
     matrix(int);
     matrix(const matrix&);
+    matrix()
     matrix(int, double const*);
+    matrix(std::initializer_list<double>);
     ~matrix();
     double* operator[](int);
     const double* operator[](int) const;
     matrix T();
     void eigen_vv(double*, double*);
-    matrix inv(const matrix&); // TODO: to be implemented.
+    matrix inv(const matrix&);
     int init(const int n); // TODO: deprecate.
     int get_size() const;
     void get_matrix_elements(double*);
     void from_array(const double*);
     friend std::ostream& operator<<(std::ostream&, const matrix&);
     void zeroize();
-    matrix zero_like(const matrix&); // TODO: implement.
+    matrix zero_like(const matrix&);
     matrix operator+(const matrix&);
     matrix& operator+=(const matrix&);
     matrix operator-(const matrix&);

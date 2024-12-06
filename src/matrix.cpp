@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include <cstring>
+#include <initializer_list>
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
@@ -21,6 +22,18 @@ matrix::matrix(const matrix& other)
     n = other.n;
     _matrix_elements = new double[n * n];
     memcpy(_matrix_elements, other._matrix_elements, n * n * sizeof(double));
+}
+
+matrix::matrix(std::initializer_list<double> list)
+{
+    n = static_cast<int>(std::sqrt(list.size()));
+
+    if (n * n != static_cast<int>(list.size())) {
+        throw std::invalid_argument("Failed to create non-square matrix");
+    }
+
+    _matrix_elements = new double[n * n];
+    std::copy(list.begin(), list.end(), _matrix_elements);
 }
 
 matrix::matrix(int init_size, double const* init_arr)
