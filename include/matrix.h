@@ -1,14 +1,14 @@
 #ifndef MATRIX_H
 #define MATRIX_H
-#include <ostream>
 #include <initializer_list>
+#include <ostream>
 
 class matrix {
 public:
     matrix();
     matrix(int);
     matrix(const matrix&);
-    matrix()
+    matrix();
     matrix(int, double const*);
     matrix(std::initializer_list<double>);
     ~matrix();
