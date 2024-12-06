@@ -12,7 +12,7 @@ public:
     ~RHF();
     void init_error_product_matrix();
     bool get_convergency();
-    matrix transform_matrix(const matrix&);
+    matrix transform_matrix();
     void calculate_error_product_matrix();
     void validate_convergency();
     void print_iteration();
@@ -22,7 +22,7 @@ public:
     void calculate_diis_fock();
     void calculate_diis_error();
     void verify_buffer(std::deque<matrix>&);
-    void update_buffer(std::deque<matrix>&, matrix);
+    void update_buffer(std::deque<matrix>&, const matrix&);
     void calculate_density();
     void calculate_eri_matrix();
     void update_energy();
