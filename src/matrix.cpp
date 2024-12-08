@@ -261,23 +261,10 @@ double frobenius_product(matrix& mat1, matrix& mat2)
     return trace(mat1.T() * mat2);
 }
 
-// matrix matrix::minor(int i, int j)
-// {
-//     matrix result(n - 1);
-//     int linear_idx = 0;
-//
-//     for (int k = 0; k < n; ++k) {
-//         for (int l = 0; l < n; ++l) {
-//             if (k != i && l != j) {
-//                 result.matrix_elements[linear_idx] = (*this)[k][l];
-//                 linear_idx += 1;
-//             }
-//         }
-//
-//         return result;
-//     }
-// }
-
+matrix matrix::minor(int i, int j) const
+{
+    matrix result(n - 1);
+    int linear_idx = 0;
     for (int k = 0; k < n; ++k) {
         for (int l = 0; l < n; ++l) {
             if (k != i && l != j) {
