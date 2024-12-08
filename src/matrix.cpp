@@ -4,6 +4,7 @@
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
+#include <cmath>
 
 matrix::matrix()
     : n(0)
@@ -146,7 +147,7 @@ void matrix::eigen_vv(double* evec, double* eval)
     delete[] work;
 }
 
-matix matrix::inv()
+matrix matrix::inv() const
 {
     matrix result = *this;
     for (int i = 0; i < n; ++i) {
@@ -268,13 +269,13 @@ matrix matrix::minor(int i, int j) const
     for (int k = 0; k < n; ++k) {
         for (int l = 0; l < n; ++l) {
             if (k != i && l != j) {
-                result.matrix_elements[linear_idx] = (*this)[k][l];
-                linear_idx += 1;
+                result._matrix_elements[linear_idx] = (*this)[k][l];
+                ++linear_idx;
             }
         }
-
-        return result;
     }
+
+    return result;
 }
 
 double det(const matrix& mat)
@@ -294,8 +295,8 @@ double det(const matrix& mat)
     double result = 0.0;
 
     for (int i = 0; i < mat.n; ++i) {
-        if (mat[0][1]) {
-            result += mat[0][1] * (i % 2 == 0 ? 1 : -1) * det(this->minor(i, j));
+        if (mat[0][i]) {
+            result += mat[0][i] * (i % 2 == 0 ? 1 : -1) * det(mat.minor(0, i));
         }
     }
 
