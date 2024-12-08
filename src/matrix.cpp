@@ -147,6 +147,18 @@ void matrix::eigen_vv(double* evec, double* eval)
     delete[] work;
 }
 
+matrix matrix::inv() const
+{
+    matrix result = *this;
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            result[i][j] = det(this->minor(i, j)) * ((i + j) % 2 == 0 ? 1 : -1);
+        }
+    }
+
+    return result / det(*this);
+}
+
 matrix& matrix::operator+=(const matrix& other)
 {
     for (int i = 0; i < n * n; ++i) {
@@ -266,3 +278,39 @@ double frobenius_product(matrix& mat1, matrix& mat2)
 //     }
 // }
 
+    for (int k = 0; k < n; ++k) {
+        for (int l = 0; l < n; ++l) {
+            if (k != i && l != j) {
+                result._matrix_elements[linear_idx] = (*this)[k][l];
+                ++linear_idx;
+            }
+        }
+    }
+
+    return result;
+}
+
+double det(const matrix& mat)
+{
+    if (mat.n == 0) {
+        return 0;
+    }
+
+    if (mat.n == 1) {
+        return mat[0][0];
+    }
+
+    if (mat.n == 2) {
+        return mat[0][0] * mat[1][1] - mat[1][0] * mat[0][1];
+    }
+
+    double result = 0.0;
+
+    for (int i = 0; i < mat.n; ++i) {
+        if (mat[0][i]) {
+            result += mat[0][i] * (i % 2 == 0 ? 1 : -1) * det(mat.minor(0, i));
+        }
+    }
+
+    return result;
+}

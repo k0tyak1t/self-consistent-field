@@ -12,7 +12,7 @@ public:
     ~RHF();
     void init_error_product_matrix();
     bool get_convergency();
-    matrix transform_matrix(const matrix& source_matrix);
+    matrix transform_matrix(const matrix&);
     void calculate_error_product_matrix();
     void validate_convergency();
     void print_iteration();
