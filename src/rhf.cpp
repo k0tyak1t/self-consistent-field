@@ -128,11 +128,11 @@ void RHF::calculate_error_product_matrix()
 
 void RHF::calculate_diis_coefs()
 {
-    // TODO: implement protperly, following code it's just placeholder!!!
-
-    for (auto i = diis_coefs.begin(); i != diis_coefs.end(); ++i) {
-        *i = 1.0 / diis_size;
-    }
+    std::cout << error_product_matrix;
+    std::cout.flush();
+    std::vector<double> b(diis_size, 0.0);
+    b.push_back(-1.0);
+    diis_coefs = error_product_matrix.inv() * b;
 }
 
 void RHF::calculate_diis_fock()
@@ -160,7 +160,6 @@ void RHF::verify_buffer(std::deque<matrix>& buffer)
 
 void RHF::update_buffer(std::deque<matrix>& buffer, const matrix& new_matrix)
 {
-
     verify_buffer(buffer);
     buffer.push_back(new_matrix);
 }
@@ -179,7 +178,8 @@ void RHF::print_iteration()
 
 void RHF::core_guess()
 {
-    mo.init(std_m.get_nAO());
+    // mo.init(std_m.get_nAO());
+    // mo(std_m.get_nAO());
     common_step();
 }
 
@@ -201,10 +201,10 @@ void RHF::solve_rhf()
     while (!is_converged) {
         roothan_hall_step(); // should be deleted when diis implemented
 
-        if (iter == diis_size) {
-            std::cout << "-- DIIS approximation started --\n";
-        }
-        // iter < diis_size ? roothan_hall_step() : diis_step(); // should be
+        // if (iter == diis_size) {
+        //     std::cout << "-- DIIS approximation started --\n";
+        // }
+        // iter < diis_size ? roothan_hall_step() : diis_step();
         update_buffer(fock_buffer, fock_matrix);
         update_buffer(error_buffer, error_matrix);
         common_step();

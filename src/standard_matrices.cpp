@@ -53,7 +53,7 @@ double standard_matrices::get_total_Vnn() const
     return total_Vnn;
 }
 
-int standard_matrices::get_nAO() const
+const int standard_matrices::get_nAO() const
 {
     return nAO;
 }

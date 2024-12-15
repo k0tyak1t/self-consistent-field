@@ -2,7 +2,7 @@
 #define MATRIX_H
 #include <initializer_list>
 #include <ostream>
-#include <initializer_list>
+#include <vector>
 
 class matrix {
 public:
@@ -18,7 +18,7 @@ public:
     void eigen_vv(double*, double*);
     matrix inv() const;
     int init(const int n); // TODO: deprecate.
-    int get_size() const;
+    const int get_size() const;
     void get_matrix_elements(double*);
     void from_array(const double*);
     friend std::ostream& operator<<(std::ostream&, const matrix&);
@@ -37,9 +37,10 @@ public:
     friend double frobenius_product(matrix&, matrix&);
     matrix minor(int, int) const;
     friend double det(const matrix&);
-
+    std::vector<double> operator*(const std::vector<double>&) const;
 private:
     int n;
     double* _matrix_elements;
 };
-#endif
+
+#endif // MATRIX_H

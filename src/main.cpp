@@ -1,9 +1,11 @@
+#ifndef TEST
 #include "input_and_md_integrals.h"
 #include "mo.h"
 #include "rhf.h"
 #include "standard_matrices.h"
 #include "utils.h"
 #include <iostream>
+#include <stdexcept>
 
 int main(int argc, char** argv)
 {
@@ -16,7 +18,6 @@ int main(int argc, char** argv)
 
     standard_matrices sm;
     InputAndMDIntegrals loader;
-    MO mo;
 
     std::cout << "-- Preparing --\n";
     if (!loader.readGeom(mol_name) || !loader.readBasisLib(basis)) {
@@ -29,10 +30,11 @@ int main(int argc, char** argv)
         throw std::runtime_error("Failed to calculate standard matrices!\n");
     }
 
+    MO mo(sm.get_nAO());
     RHF rhf(sm, mo);
-    // rhf.roothan_hall();
     rhf.solve_rhf();
 
     print_energies(mo);
     return 0;
 }
+#endif // !TEST

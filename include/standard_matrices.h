@@ -15,7 +15,7 @@ public:
     int set_num_el(int);
     int set_total_Vnn(const double);
     double get_total_Vnn() const;
-    int get_nAO() const;
+    const int get_nAO() const;
 
 private:
     int nAO;

@@ -5,6 +5,7 @@
 #include <ostream>
 #include <stdexcept>
 #include <cmath>
+#include <vector>
 
 matrix::matrix()
     : n(0)
@@ -25,16 +26,16 @@ matrix::matrix(const matrix& other)
     memcpy(_matrix_elements, other._matrix_elements, n * n * sizeof(double));
 }
 
-matrix::matrix(std::initializer_list<double> list)
+matrix::matrix(std::initializer_list<double> init_list)
 {
-    n = static_cast<int>(std::sqrt(list.size()));
+    n = static_cast<int>(std::sqrt(init_list.size()));
 
-    if (n * n != static_cast<int>(list.size())) {
+    if (n * n != static_cast<int>(init_list.size())) {
         throw std::invalid_argument("Failed to create non-square matrix");
     }
 
     _matrix_elements = new double[n * n];
-    std::copy(list.begin(), list.end(), _matrix_elements);
+    std::copy(init_list.begin(), init_list.end(), _matrix_elements);
 }
 
 matrix::matrix(int init_size, double const* init_arr)
@@ -91,7 +92,7 @@ matrix matrix::zero_like(const matrix& other)
     return result;
 }
 
-int matrix::get_size() const { return n; }
+const int matrix::get_size() const { return n; }
 
 void matrix::get_matrix_elements(double* dest_arr)
 {
@@ -105,9 +106,9 @@ void matrix::get_matrix_elements(double* dest_arr)
     }
 }
 
-void matrix::from_array(const double* source_array)
+void matrix::from_array(const double* src)
 {
-    memcpy(_matrix_elements, source_array, n * n * sizeof(double));
+    memcpy(_matrix_elements, src, n * n * sizeof(double));
 }
 
 matrix matrix::T()
@@ -147,17 +148,84 @@ void matrix::eigen_vv(double* evec, double* eval)
     delete[] work;
 }
 
-matrix matrix::inv() const
-{
-    matrix result = *this;
+matrix matrix::inv() const {
+    if (n <= 0) {
+        throw std::invalid_argument("Matrix size must be greater than zero");
+    }
+
+    double determinant = det(*this);
+    if (determinant == 0) {
+        throw std::runtime_error("Matrix is singular and cannot be inverted");
+    }
+
+    // Create identity matrix
+    matrix identity(n);
     for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < n; ++j) {
-            result[i][j] = det(this->minor(i, j)) * ((i + j) % 2 == 0 ? 1 : -1);
+        identity[i][i] = 1.0;
+    }
+
+    // Step 1: LU Decomposition with partial pivoting
+    std::vector<int> pivot(n);
+    matrix LU = *this;
+    for (int i = 0; i < n; ++i) pivot[i] = i;
+
+    for (int k = 0; k < n; ++k) {
+        // Find pivot row
+        double max_val = 0.0;
+        int max_row = k;
+        for (int i = k; i < n; ++i) {
+            if (std::abs(LU[pivot[i]][k]) > max_val) {
+                max_val = std::abs(LU[pivot[i]][k]);
+                max_row = i;
+            }
+        }
+        if (max_val == 0.0) {
+            throw std::runtime_error("Matrix is singular and cannot be inverted");
+        }
+
+        // Swap rows in pivot
+        std::swap(pivot[k], pivot[max_row]);
+
+        // Perform LU factorization
+        for (int i = k + 1; i < n; ++i) {
+            LU[pivot[i]][k] /= LU[pivot[k]][k];
+            for (int j = k + 1; j < n; ++j) {
+                LU[pivot[i]][j] -= LU[pivot[i]][k] * LU[pivot[k]][j];
+            }
         }
     }
 
-    return result / det(*this);
+    // Step 2: Invert the matrix using forward and backward substitution
+    matrix inverse(n);
+    for (int col = 0; col < n; ++col) {
+        // Forward substitution: solve LY = I[:, col]
+        std::vector<double> Y(n, 0.0);
+        for (int i = 0; i < n; ++i) {
+            Y[i] = identity[pivot[i]][col];
+            for (int j = 0; j < i; ++j) {
+                Y[i] -= LU[pivot[i]][j] * Y[j];
+            }
+        }
+
+        // Backward substitution: solve UX = Y
+        std::vector<double> X(n, 0.0);
+        for (int i = n - 1; i >= 0; --i) {
+            X[i] = Y[i];
+            for (int j = i + 1; j < n; ++j) {
+                X[i] -= LU[pivot[i]][j] * X[j];
+            }
+            X[i] /= LU[pivot[i]][i];
+        }
+
+        // Set the column of the inverse matrix
+        for (int i = 0; i < n; ++i) {
+            inverse[i][col] = X[i];
+        }
+    }
+
+    return inverse;
 }
+
 
 matrix& matrix::operator+=(const matrix& other)
 {
@@ -299,5 +367,20 @@ double det(const matrix& mat)
         }
     }
 
+    return result;
+}
+
+std::vector<double> matrix::operator*(const std::vector<double>& vec) const
+{
+    std::vector<double> result;
+
+    double ri = 0;
+    for (int i = 0; i < n; ++i) {
+        ri = 0;
+        for (int j = 0; j < n; ++j) {
+            ri += (*this)[i][j] * vec[j];
+        }
+        result.push_back(ri);
+    }
     return result;
 }

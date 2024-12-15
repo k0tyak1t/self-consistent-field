@@ -1,18 +1,18 @@
-#ifndef MOS_H
-#define MOS_H
+#ifndef MO_H
+#define MO_H
 #include "matrix.h"
 
 class MO {
 public:
+    MO(const int);
     MO();
     ~MO();
     matrix C; // MO to AO expansion. MO in columns
-    int init(const int);
-    double get_mo_energy(const int) const;
-    int get_size();
+    const double get_mo_energy(const int) const;
+    const int get_size() const;
     int set_mo_energy(const int, const double);
     int set_total_energy(const double);
-    double get_total_energy() const;
+    const double get_total_energy() const;
     int get_irrep_characters(const int&) const;
     bool set_c2v(int* symmAO, const double& limit);
     void set_mo_energies(const double*);
@@ -24,4 +24,4 @@ private:
     int* irrep;
 };
 
-#endif
+#endif // MO_H

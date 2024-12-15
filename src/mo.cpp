@@ -3,34 +3,29 @@
 #include <cstring>
 #include <iostream>
 
-MO::MO()
-    : n(0)
+MO::MO(const int n)
+    : n(n)
 {
+    if (!n) {return;}
+
+    mo_energies = new double[n];
+    irrep = new int[n];
+    C(n);
 }
+
+MO::MO(): MO(0) {}
 
 MO::~MO()
 {
-    if (n > 0) {
+    if (n) {
         delete[] mo_energies;
         delete[] irrep;
     }
 }
 
-int MO::init(const int n_new)
-{
-    if (n > 0) {
-        throw std::runtime_error("Object Cl2 already have size!\n");
-    }
-    n = n_new;
-    mo_energies = new double[n_new];
-    irrep = new int[n_new];
-    C.init(n_new);
-    return 0;
-}
+const int MO::get_size() const { return n; }
 
-int MO::get_size() { return n; }
-
-double MO::get_mo_energy(const int i) const { return mo_energies[i]; }
+const double MO::get_mo_energy(const int i) const { return mo_energies[i]; }
 
 int MO::get_irrep_characters(const int& i) const { return irrep[i]; }
 
@@ -46,7 +41,7 @@ int MO::set_total_energy(const double new_total_energy)
     return 0;
 }
 
-double MO::get_total_energy() const { return total_energy; }
+const double MO::get_total_energy() const { return total_energy; }
 
 bool MO::set_c2v(int* symmAO, const double& limit)
 {
