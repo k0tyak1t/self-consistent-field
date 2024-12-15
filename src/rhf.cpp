@@ -29,7 +29,7 @@ RHF::RHF(standard_matrices& std_m, MO& mo)
     std::cout << "\n-- Running SCF procedure --\n"
               << "Electrons: " << std_m.get_num_el() << std::endl
               << "Max iterations: " << max_iter << std::endl
-              << "Energy tolerance: " << etol << std::endl;
+              << "Energy tolerance: " << etol << "\n\n";
 }
 
 RHF::~RHF()

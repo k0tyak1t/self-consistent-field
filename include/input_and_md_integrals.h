@@ -34,8 +34,8 @@ private:
     int get_nuclear_charge(const std::string&) const;
     int get_orbital_momentum(const std::string&) const;
     struct Atom {
-        double x, y, z;
         int q;
+        double x, y, z;
     };
     vector<Atom> atoms;
     map<int, vector<pair<int, vector<pair<double, double>>>>> basisLib;

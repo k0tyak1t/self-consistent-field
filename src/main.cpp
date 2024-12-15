@@ -19,7 +19,7 @@ int main(int argc, char** argv)
     standard_matrices sm;
     InputAndMDIntegrals loader;
 
-    std::cout << "-- Preparing --\n";
+    std::cout << "Preparing...\n";
     if (!loader.readGeom(mol_name) || !loader.readBasisLib(basis)) {
         throw std::runtime_error("Failed to load geometry or basis!\n");
     }

@@ -4,16 +4,16 @@
 
 class standard_matrices {
 public:
-    ~standard_matrices();
+    standard_matrices(const unsigned int);
     standard_matrices();
-    standard_matrices(int);
-    int init(int);
-    double get_Vee(int, int, int, int) const;
-    int set_Vee(int, int, int, int, double);
+    ~standard_matrices();
+    void init(const unsigned int);
+    const double get_Vee(int, int, int, int) const;
+    void set_Vee(int, int, int, int, double);
     matrix S, T, H, Ven, X;
-    int get_num_el() const;
-    int set_num_el(int);
-    int set_total_Vnn(const double);
+    const int get_num_el() const;
+    void set_num_el(const unsigned int);
+    void set_total_Vnn(const double);
     double get_total_Vnn() const;
     const int get_nAO() const;
 
@@ -24,4 +24,4 @@ private:
     double* Vee;
 };
 
-#endif
+#endif // STANDARD_MATRICES_H

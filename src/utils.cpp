@@ -24,12 +24,12 @@ void display_progress(int progress, const std::string& leading_str)
 {
     int progress_bar_width = 30;
     int cursor_position = progress_bar_width * progress / 100;
-    std::cout << std::setw(20) << leading_str;
+    std::cout << std::setw(20) << std::left << leading_str;
     for (int i = 0; i < progress_bar_width; ++i) {
         std::cout << (i <= cursor_position ? "█" : "▒");
         std::cout.flush();
     }
-    std::cout << " " << std::setw(5) << int(progress) << " %\r";
+    std::cout << " " << int(progress) << "%\r";
     std::cout.flush();
 
     if (progress == 100) {

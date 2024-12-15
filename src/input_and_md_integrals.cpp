@@ -9,8 +9,8 @@
 bool InputAndMDIntegrals::readGeom(char* filename)
 {
     ifstream inp(filename);
-    int nAtoms;
-    inp >> nAtoms;
+    int num_atoms;
+    inp >> num_atoms;
     string cur_str;
     getline(inp, cur_str); // skipping of comment line
     getline(inp, cur_str);
@@ -26,7 +26,7 @@ bool InputAndMDIntegrals::readGeom(char* filename)
         atoms.push_back(atomTmp);
     }
     inp.close();
-    if (nAtoms != int(atoms.size())) {
+    if (num_atoms != int(atoms.size())) {
         cerr << "Check number of atoms in file: " << filename << "\n";
         return false;
     }
@@ -75,14 +75,14 @@ bool InputAndMDIntegrals::calc(standard_matrices& std_m)
     //	Вычисление энергии электрон-электронного взаимодействия и числа
     // электронов из условия электронейтральности
     double total_Vnn = 0;
-    int nElec = 0;
+    int num_el = 0;
     for (int i = 0; i < int(atoms.size()); i++) {
-        nElec += atoms[i].q;
+        num_el += atoms[i].q;
         for (int j = i + 1; j < int(atoms.size()); j++)
             total_Vnn += atoms[i].q * atoms[j].q / sqrt(pow(atoms[i].x - atoms[j].x, 2) + pow(atoms[i].y - atoms[j].y, 2) + pow(atoms[i].z - atoms[j].z, 2));
     }
     std_m.set_total_Vnn(total_Vnn);
-    std_m.set_num_el(nElec);
+    std_m.set_num_el(num_el);
 
     //	расчет матричных элементов S,T,Hcore
     int ii, jj, kk, ll;
