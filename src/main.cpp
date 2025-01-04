@@ -1,40 +1,50 @@
 #ifndef TEST
-#include "input_and_md_integrals.h"
-#include "mo.h"
-#include "rhf.h"
-#include "standard_matrices.h"
-#include "utils.h"
 #include <iostream>
 #include <stdexcept>
 
-int main(int argc, char** argv)
-{
-    char* mol_name = argv[1];
-    char* basis = argv[2];
+#include "diis.h"
+#include "input_and_md_integrals.h"
+#include "mo.h"
+#include "standard_matrices.h"
+#include <assert.h>
+#include <cmath>
 
-    if (argc < 2) {
-        throw std::runtime_error("Filename should be specified!\n");
-    }
+int main(int argc, char **argv) {
+  char *mol_name = argv[1];
+  char *basis = argv[2];
 
-    standard_matrices sm;
-    InputAndMDIntegrals loader;
+  if (argc < 2) {
+    throw std::runtime_error("Filename should be specified!\n");
+  }
 
-    std::cout << "Preparing...\n";
-    if (!loader.readGeom(mol_name) || !loader.readBasisLib(basis)) {
-        throw std::runtime_error("Failed to load geometry or basis!\n");
-    }
+  StandardMatrices sm;
+  InputAndMDIntegrals loader;
 
-    loader.makeBasis();
+  std::cout << "Preparing...\n";
+  if (!loader.readGeom(mol_name) || !loader.readBasisLib(basis)) {
+    throw std::runtime_error("Failed to load geometry or basis!\n");
+  }
 
-    if (!loader.calc(sm)) {
-        throw std::runtime_error("Failed to calculate standard matrices!\n");
-    }
+  loader.makeBasis();
 
-    MO mo(sm.get_nAO());
-    RHF rhf(sm, mo);
-    rhf.solve_rhf();
+  if (!loader.calc(sm)) {
+    throw std::runtime_error("Failed to calculate standard matrices!\n");
+  }
 
-    print_energies(mo);
-    return 0;
+  MO mo(sm.get_nAO());
+
+#ifdef NDIIS
+  SCF rhf(mo, sm);
+#else
+  DIIS rhf(mo, sm);
+#endif
+  rhf.solve();
+
+  double orca_total = -75.982755093316;
+  std::cout << orca_total / rhf.get_total_energy() << std::endl;
+  assert(fabs(orca_total - rhf.get_total_energy()) < 1e-5);
+
+  return 0;
 }
+
 #endif // !TEST
