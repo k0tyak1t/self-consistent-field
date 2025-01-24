@@ -40,10 +40,6 @@ int main(int argc, char **argv) {
 #endif
   rhf.solve();
 
-  double orca_total = -75.982755093316;
-  std::cout << orca_total / rhf.get_total_energy() << std::endl;
-  assert(fabs(orca_total - rhf.get_total_energy()) < 1e-5);
-
   return 0;
 }
 

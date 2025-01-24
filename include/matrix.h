@@ -37,6 +37,7 @@ public:
   friend double det(const matrix &);
   matrix T();
   void eigen_vv(double *, double *);
+  matrix inverse() const;
 
   // initializers
   void zeroize();

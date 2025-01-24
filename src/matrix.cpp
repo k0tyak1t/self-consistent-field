@@ -9,6 +9,14 @@
 #include <stdexcept>
 #include <vector>
 
+extern "C" {
+// LU decomoposition of a general matrix
+void dgetrf_(int *M, int *N, double *A, int *lda, int *IPIV, int *INFO);
+// generate inverse of a matrix given its LU decomposition
+void dgetri_(int *N, double *A, int *lda, int *IPIV, double *WORK, int *lwork,
+             int *INFO);
+}
+
 // * * * * ------------ * * * * //
 // * * * * cunstructors * * * * //
 // * * * * ------------ * * * * //
@@ -257,6 +265,20 @@ void matrix::eigen_vv(double *evec, double *eval) {
     throw std::runtime_error("Failed to diagonalize matrix!\n");
   }
   delete[] work;
+}
+
+matrix matrix::inverse() const {
+  matrix inv = *this;
+  int N = n;
+  int *IPIV = new int[n];
+  int LWORK = n * n;
+  double *WORK = new double[LWORK];
+  int INFO;
+  dgetrf_(&N, &N, inv.data(), &N, IPIV, &INFO);
+  dgetri_(&N, inv.data(), &N, IPIV, WORK, &LWORK, &INFO);
+  delete[] IPIV;
+  delete[] WORK;
+  return inv;
 }
 
 // * * * * ------------ * * * * //

@@ -8,6 +8,8 @@ TARGET = scf.x
 
 ARGS ?= geometry/h2o.xyz basis/6311.basis
 
+DEFS_ = $(addprefix -D, $(DEFS))
+
 # libraries
 LIBS_ := lapack lapacke boost_math_c99 blas
 LIBS = $(addprefix -l, $(LIBS_)) -L$(LDIR)
@@ -31,7 +33,7 @@ all: $(OBJS) $(TARGET)
 
 $(ODIR)/%.o: $(SDIR)/%.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) $(LIBS) -c $< -o $@
+	$(CXX) $(DEFS_) $(CXXFLAGS) $(LIBS) -c $< -o $@
 
 $(TARGET): $(OBJS)
 	$(CXX) $^ $(LIBS) -o $(TARGET)

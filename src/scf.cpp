@@ -8,7 +8,7 @@
 
 SCF::SCF(MO &mo, StandardMatrices &std_m)
     : etol(DEFAULT_ETOL), max_iter(DEFAULT_MAX_ITER), prev_energy(0.0),
-      cur_energy(0.0), mo(mo), std_m(std_m), nAO(std_m.get_nAO()) {
+      cur_energy(1.0), mo(mo), std_m(std_m), nAO(std_m.get_nAO()) {
   mo_energies = std::vector<double>(nAO);
   density = matrix(nAO);
   fock = matrix(nAO);
@@ -71,6 +71,9 @@ void SCF::update_fock() {
       }
     }
   }
+#ifndef NDEBUG
+  std::cout << "Fock matrix: \n" << fock;
+#endif
 }
 
 #if 0
@@ -120,3 +123,4 @@ void SCF::solve() {
 
   std::cout << "SCF didn't converge in " << max_iter << " iterations.\n";
 }
+// :)
