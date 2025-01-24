@@ -11,6 +11,7 @@
 #include "mur_dav_prim_integrals.h"
 #include "standard_matrices.h"
 #include "utils.h"
+#define ANGSTROM_TO_BOHR 1.8897259886
 
 bool InputAndMDIntegrals::readGeom(char *filename) {
   std::ifstream inp(filename);
@@ -21,6 +22,9 @@ bool InputAndMDIntegrals::readGeom(char *filename) {
   getline(inp, cur_str);
   Atom cur_atom;
   while (inp >> cur_str >> cur_atom.x >> cur_atom.y >> cur_atom.z) {
+    cur_atom.x *= ANGSTROM_TO_BOHR;
+    cur_atom.y *= ANGSTROM_TO_BOHR;
+    cur_atom.z *= ANGSTROM_TO_BOHR;
     cur_atom.q = get_nuclear_charge(cur_str);
     if (cur_atom.q == 0) {
       throw std::runtime_error("Incorrect atom.");
