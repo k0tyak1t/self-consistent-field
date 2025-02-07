@@ -2,7 +2,6 @@
 
 #include <cmath>
 #include <cstring>
-#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <ostream>
@@ -18,48 +17,43 @@ void dgetri_(int *N, double *A, int *lda, int *IPIV, double *WORK, int *lwork,
 }
 
 // * * * * ------------ * * * * //
-// * * * * cunstructors * * * * //
+// * * * * constructors * * * * //
 // * * * * ------------ * * * * //
-matrix::matrix() : n(0), _matrix_elements(nullptr) {}
+matrix::matrix() : n(0), data_(nullptr) {}
 
-matrix::matrix(int n_new) : n(n_new) { _matrix_elements = new double[n * n]; }
+matrix::matrix(std::size_t n_new) : n(n_new) { data_ = new double[n * n]; }
 
 matrix::matrix(const matrix &other) {
   n = other.n;
-  _matrix_elements = new double[n * n];
-  memcpy(_matrix_elements, other._matrix_elements, n * n * sizeof(double));
+  data_ = new double[n * n];
+  memcpy(data_, other.data_, n * n * sizeof(double));
+#ifndef NDEBUG
+  std::cout << "matrix created!\n";
+#endif
 }
 
-matrix::matrix(int init_size, double const *init_arr) : n(init_size) {
-  _matrix_elements = new double[n * n];
-  memcpy(_matrix_elements, init_arr, n * n * sizeof(double));
+matrix::matrix(std::size_t init_size, double const *init_arr) : n(init_size) {
+  data_ = new double[n * n];
+  memcpy(data_, init_arr, n * n * sizeof(double));
 }
 
-matrix::matrix(std::initializer_list<double> init_list) {
-  n = static_cast<int>(std::sqrt(init_list.size()));
-
-  if (n * n != static_cast<int>(init_list.size())) {
-    throw std::invalid_argument("Failed to create non-square matrix");
-  }
-
-  _matrix_elements = new double[n * n];
-  std::copy(init_list.begin(), init_list.end(), _matrix_elements);
+matrix::~matrix() {
+  delete[] data_;
+#ifndef NDEBUG
+  std::cout << "matrix destroyed!\n";
+#endif // NDEBUG
 }
 
-matrix::~matrix() { delete[] _matrix_elements; }
-
-// * * * * --------- * * * * //
+// * * * * ********* * * * * //
 // * * * * operators * * * * //
-// * * * * --------- * * * * //
-double *matrix::operator[](int row) { return &_matrix_elements[row * n]; }
+// * * * * ********* * * * * //
+double *matrix::operator[](int row) { return &data_[row * n]; }
 
-const double *matrix::operator[](int row) const {
-  return &_matrix_elements[row * n];
-}
+const double *matrix::operator[](int row) const { return &data_[row * n]; }
 
 matrix &matrix::operator+=(const matrix &other) {
-  for (int i = 0; i < n * n; ++i) {
-    _matrix_elements[i] += other._matrix_elements[i];
+  for (auto i = 0; i < n * n; ++i) {
+    data_[i] += other.data_[i];
   }
 
   return *this;
@@ -73,7 +67,7 @@ matrix matrix::operator+(const matrix &other) {
 
 matrix &matrix::operator-=(const matrix &other) {
   for (int i = 0; i < n; ++i) {
-    _matrix_elements[i] -= other._matrix_elements[i];
+    data_[i] -= other.data_[i];
   }
   return *this;
 }
@@ -100,7 +94,7 @@ matrix matrix::operator*(const matrix &other) {
 matrix matrix::operator*(const double num) {
   matrix result(n);
   for (int i = 0; i < n * n; ++i)
-    result._matrix_elements[i] *= num;
+    result.data_[i] *= num;
 
   return result;
 }
@@ -117,26 +111,26 @@ matrix matrix::operator/(const double num) {
 
 matrix &matrix::operator=(const matrix &other) {
   if (this != &other) {
-    delete[] _matrix_elements;
+    delete[] data_;
     n = other.n;
-    _matrix_elements = new double[n * n];
-    memcpy(_matrix_elements, other._matrix_elements, n * n * sizeof(double));
+    data_ = new double[n * n];
+    memcpy(data_, other.data_, n * n * sizeof(double));
   }
   return *this;
 }
 
 void matrix::operator()(int new_size) {
   if (n) {
-    delete[] _matrix_elements;
+    delete[] data_;
   }
   n = new_size;
-  _matrix_elements = new double[n * n];
+  data_ = new double[n * n];
 }
 
 std::ostream &operator<<(std::ostream &os, const matrix &mat) {
   for (int i = 0; i < mat.n; ++i) {
     for (int j = 0; j < mat.n; ++j) {
-      os << std::setprecision(4) << mat[i][j] << " ";
+      os << std::setprecision(4) << std::setw(8) << mat[i][j] << " ";
     }
     os << '\n';
   }
@@ -159,7 +153,7 @@ std::vector<double> matrix::operator*(const std::vector<double> &vec) const {
 
 bool matrix::operator==(const matrix &other) {
   for (int i = 0; i < n * n; ++i) {
-    if (_matrix_elements[i] != other._matrix_elements[i])
+    if (data_[i] != other.data_[i])
       return false;
   }
 
@@ -180,7 +174,7 @@ double trace(const matrix &mat) {
 double matrix::trace() {
   double result = 0;
   for (int i = 0; i < n; ++i) {
-    result += _matrix_elements[i * (1 + n)];
+    result += data_[i * (1 + n)];
   }
   return result;
 }
@@ -200,7 +194,7 @@ matrix matrix::minor(int i, int j) const {
   for (int k = 0; k < n; ++k) {
     for (int l = 0; l < n; ++l) {
       if (k != i && l != j) {
-        result._matrix_elements[linear_idx] = (*this)[k][l];
+        result.data_[linear_idx] = (*this)[k][l];
         ++linear_idx;
       }
     }
@@ -286,7 +280,7 @@ matrix matrix::inverse() const {
 // * * * * ------------ * * * * //
 void matrix::zeroize() {
   for (int i = 0; i < n * n; ++i) {
-    _matrix_elements[i] = 0;
+    data_[i] = 0;
   }
 }
 
@@ -295,19 +289,19 @@ int matrix::init(const int n_new) {
     throw std::runtime_error("Matrix already initialized.\n");
   }
   n = n_new;
-  _matrix_elements = new double[n * n];
+  data_ = new double[n * n];
   return 0;
 }
 
 void matrix::from_array(const double *src) {
-  memcpy(_matrix_elements, src, n * n * sizeof(double));
+  memcpy(data_, src, n * n * sizeof(double));
 }
 
 matrix zero_like(const matrix &other) {
   matrix result = other;
   int n = other.n;
   for (int i = 0; i < n * n; ++i) {
-    result._matrix_elements[i] = 0;
+    result.data_[i] = 0;
   }
 
   return result;
@@ -316,6 +310,6 @@ matrix zero_like(const matrix &other) {
 // * * * * ------------ * * * * //
 // * * * *   getters    * * * * //
 // * * * * ------------ * * * * //
-double *matrix::data() { return _matrix_elements; }
+double *matrix::data() { return data_; }
 
 int matrix::get_size() const { return n; }

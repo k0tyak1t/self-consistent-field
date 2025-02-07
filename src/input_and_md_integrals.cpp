@@ -75,7 +75,7 @@ bool InputAndMDIntegrals::readBasisLib(char *filename) {
 
 bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   std_m.init(basisFunctions.size());
-  //	Вычисление энергии электрон-электронного взаимодействия и числа
+  // Вычисление энергии электрон-электронного взаимодействия и числа
   // электронов из условия электронейтральности
   double total_Vnn = 0;
   int num_el = 0;
@@ -90,7 +90,7 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   std_m.set_total_Vnn(total_Vnn);
   std_m.set_num_el(num_el);
 
-  //	расчет матричных элементов S,T,Hcore
+  // расчет матричных элементов S,T,Hcore
   int ii, jj, kk, ll;
   ii = jj = 0;
   for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i =
@@ -216,25 +216,20 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   std::cout << std::endl;
   //	Матрица X
   int nAO = basisFunctions.size();
-  std_m.X.init(nAO);
+  std_m.X = matrix{nAO};
   double *evec = new double[nAO * nAO];
   double *eval = new double[nAO];
   std_m.S.eigen_vv(evec, eval);
-  matrix s;
-  s.init(nAO);
-  for (int i = 0; i < nAO; i++) { // создание матрицы S^(-0.5)
-    for (int j = 0; j < nAO; j++) {
-      s[i][j] = 0;
-    }
-    s[i][i] = 1.0 / sqrt(eval[i]);
-  }
+  matrix s{nAO};
+  for (int i = 0; i < nAO; i++) // создание матрицы S^(-0.5)
+    for (int j = 0; j < nAO; j++)
+      i != j ? s[i][j] = 0 : s[i][i] = 1.0 / sqrt(eval[i]);
+
   delete[] eval;
-  matrix U;
-  U.init(nAO);
+  matrix U{nAO};
   U.from_array(evec);
   delete[] evec;
-  matrix vs;
-  vs.init(nAO);
+  matrix vs{nAO};
   std_m.X = U.T() * s * U;
   return true;
 }
@@ -433,7 +428,7 @@ int InputAndMDIntegrals::get_nuclear_charge(const std::string &str_) const {
 
 int InputAndMDIntegrals::get_orbital_momentum(const std::string &str_) const {
   std::string str(str_);
-  std::transform(str.begin(), str.end(), str.begin(), toupper);
+  std::transform(str.begin(), str.end(), str.begin(), ::toupper);
   if ((str == "S") || (str == "L0"))
     return 0;
   if ((str == "P") || (str == "L1"))

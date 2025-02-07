@@ -39,8 +39,8 @@ protected:
   int max_iter;
   double prev_energy, cur_energy;
   std::vector<double> mo_energies;
-  MO &mo;
-  StandardMatrices &std_m;
+  MO &mo;                  // wtf???
+  StandardMatrices &std_m; // wtf??
   int nAO;
   matrix density, fock, lcao_coefs;
 };

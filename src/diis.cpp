@@ -41,11 +41,13 @@ void DIIS::update_error() {
   error = matrix(std::max(n_occ, n_virt));
   error.zeroize();
 
-  for (auto i = 0u; i < n_occ; ++i) {
-    for (auto j = 0u; j < n_virt; ++j) {
+  for (auto i = 0u; i < n_occ; ++i)
+    for (auto j = 0u; j < n_virt; ++j)
       error[i][j] = fock_mo[i][j + n_occ];
-    }
-  }
+
+#ifndef NDEBUG
+  std::cout << "num occ: " << n_occ << " num unocc: " << n_virt << std::endl;
+#endif
 #endif
 }
 
@@ -173,10 +175,12 @@ void DIIS::solve() {
 
   std::cout << "DIIS-SCF didn't converge in " << max_iter << " iterations.\n";
 }
-#endif
-
+#else
 void DIIS::solve() {
   core_guess();
+#ifndef NDEBUG
+  std::cout << "H core: \n" << std_m.H << std::endl;
+#endif
 
   for (int iter = 1; iter <= max_iter; ++iter) {
     if (fabs(cur_energy - prev_energy) < etol) {
@@ -208,4 +212,4 @@ void DIIS::solve() {
 
   std::cout << "DIIS-SCF didn't converge in " << max_iter << " iterations.\n";
 }
-// :)
+

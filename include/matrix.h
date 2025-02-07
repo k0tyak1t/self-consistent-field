@@ -1,16 +1,17 @@
+#ifndef USE_NEW_MATRICES
 #pragma once
-#include <initializer_list>
 #include <ostream>
 #include <vector>
 
 class matrix {
+  class RowProxy;
+
 public:
   // constructors & destructor
   matrix();
-  matrix(int);
+  matrix(std::size_t);
   matrix(const matrix &);
-  matrix(int, double const *);
-  matrix(std::initializer_list<double>);
+  matrix(std::size_t, double const *);
   ~matrix();
 
   // operators
@@ -50,6 +51,24 @@ public:
   int get_size() const;
 
 private:
-  int n;
-  double *_matrix_elements;
+  std::size_t n;
+  double *data_;
+
+private:
+  class RowProxy {
+  public: // selectors
+    double operator[](std::size_t) const;
+    const double *begin() const;
+    const double *end() const;
+
+  public: // modifiers
+    double operator[](std::size_t);
+    double *begin();
+    double *end();
+
+  private:
+    std::size_t n;
+    double *data;
+  };
 };
+#endif

@@ -13,10 +13,6 @@ SCF::SCF(MO &mo, StandardMatrices &std_m)
   density = matrix(nAO);
   fock = matrix(nAO);
   lcao_coefs = matrix(nAO);
-
-  assert(std_m.X[0][0] == (std_m.X.T())[0][0]);
-  assert(std_m.S[0][0] == (std_m.S.T())[0][0]);
-  assert(std_m.H[0][0] == (std_m.H.T())[0][0]);
 }
 
 double SCF::get_total_energy() { return cur_energy + std_m.get_total_Vnn(); }
@@ -39,6 +35,14 @@ void SCF::core_guess() { fock = std_m.H; }
 void SCF::update_lcao_coefs() {
   transform_matrix(fock).eigen_vv(lcao_coefs.data(), mo_energies.data());
   lcao_coefs = std_m.X * lcao_coefs.T();
+
+#ifndef NDEBUG
+  std::cout << "mo energies: ";
+  for (auto i : mo_energies) {
+    std::cout << " " << i;
+  }
+  std::cout << std::endl;
+#endif
 }
 
 // D = CC^{\dagger}
@@ -105,6 +109,9 @@ void SCF::update_energy() {
 
 void SCF::solve() {
   core_guess();
+#ifndef NDEBUG
+  std::cout << "H core: \n" << std_m.H << std::endl;
+#endif
 
   for (int iter = 1; iter <= max_iter; ++iter) {
     update_lcao_coefs();
@@ -121,6 +128,5 @@ void SCF::solve() {
     }
   }
 
-  std::cout << "SCF didn't converge in " << max_iter << " iterations.\n";
+  std::cerr << "SCF did not converge in " << max_iter << " iterations.\n";
 }
-// :)

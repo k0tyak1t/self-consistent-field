@@ -19,19 +19,18 @@ StandardMatrices::StandardMatrices(const unsigned int nAO) : nAO(nAO) {
   eri = new double[nAO * nAO * nAO * nAO];
 }
 
-StandardMatrices::StandardMatrices() : StandardMatrices(0) {};
-
 void StandardMatrices::init(const unsigned int n_new) {
   if (nAO) {
     throw std::runtime_error("AO already exists!");
   }
 
   nAO = n_new;
-  S.init(n_new);
-  T.init(n_new);
-  H.init(n_new);
-  Ven.init(n_new);
-  eri = new double[n_new * n_new * n_new * n_new];
+  S = matrix{nAO};
+  T = matrix{nAO};
+  H = matrix{nAO};
+  S = matrix{nAO};
+  Ven = matrix{nAO};
+  eri = new double[n_new * n_new * n_new * n_new]{};
 }
 
 void StandardMatrices::set_total_Vnn(const double new_total_Vnn) {

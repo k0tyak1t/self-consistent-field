@@ -3,8 +3,7 @@
 
 class StandardMatrices {
 public: // members
-  StandardMatrices(const unsigned int);
-  StandardMatrices();
+  StandardMatrices(const unsigned int = 0);
   ~StandardMatrices();
 
   void init(const unsigned int);
@@ -20,12 +19,12 @@ public: // members
   void set_total_Vnn(const double);
   void set_num_el(const unsigned int);
 
-public: // fields
-  matrix S, T, H, Ven, X;
-
 private: // fields
   int nAO;
   int num_el;
   double total_Vnn;
   double *eri;
+
+public: // fields
+  matrix S, T, H, Ven, X;
 };
