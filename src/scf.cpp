@@ -49,10 +49,10 @@ void SCF::update_lcao_coefs() {
 // D_{\mu\nu} = 2 \sum_{a = 1}^{n_{el}/2}{C_{\mu a}C_{\nu a}}
 // src: "Modern Quantum Chemistry", p.139, f-No. 3.145
 void SCF::update_density() {
-  for (int m = 0; m < nAO; ++m) {
-    for (int n = 0; n < nAO; ++n) {
+  for (std::size_t m = 0; m < nAO; ++m) {
+    for (std::size_t n = 0; n < nAO; ++n) {
       density[m][n] = 0;
-      for (int a = 0; a < std_m.get_num_el() / 2; ++a) {
+      for (std::size_t a = 0; a < std_m.get_num_el() / 2; ++a) {
         density[m][n] += 2 * lcao_coefs[m][a] * lcao_coefs[n][a];
       }
     }

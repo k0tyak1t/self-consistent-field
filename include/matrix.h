@@ -24,11 +24,15 @@ public: // static factory methods
   template <typename It> static matrix from_array(const It &, const It &);
 
 public: // selectors
-  const RowProxy operator[](std::size_t);
+  const RowProxy operator[](std::size_t) const;
   const double *begin() const { return data_; }
   const double *end() const { return data_ + n * n; }
 
 public: // modifiers
+  RowProxy operator[](std::size_t);
+  double *begin() { return data_; }
+  double *end() { return data_ + n * n; }
+
 public: // operators
   matrix &operator+=(const matrix &);
   matrix operator+(const matrix &);
@@ -47,7 +51,7 @@ public: // operators
   friend double trace(const matrix &);
   double trace();
   friend double frobenius_product(matrix &, matrix &);
-  matrix minor(int, int) const;
+  matrix minor(std::size_t, std::size_t) const;
   friend double det(const matrix &);
   matrix T();
   void eigen_vv(double *, double *);
@@ -70,23 +74,23 @@ private: // fields
 
 private: // proxy for getters
   class RowProxy {
-  public: // constructors and desctuctor
-    RowProxy(std::size_t, double *);
-    ~RowProxy() = default;
+  public: // constructors, default destructor
+    RowProxy() : n(0), data_(nullptr) {}
+    RowProxy(std::size_t n, double *data_) : n(n), data_(data_) {}
 
   public: // selectors
-    double operator[](std::size_t) const;
-    const double *begin() const;
-    const double *end() const;
+    const double &operator[](std::size_t) const;
+    const double *begin() const { return data_; }
+    const double *end() const { return data_ + n * n; }
 
   public: // modifiers
-    double operator[](std::size_t);
-    double *begin();
-    double *end();
+    double &operator[](std::size_t);
+    double *begin() { return data_; }
+    double *end() { return data_ + n * n; }
 
   private: // fields
     std::size_t n;
-    double *data;
+    double *data_;
   };
 };
 #endif

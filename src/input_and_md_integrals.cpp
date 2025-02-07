@@ -215,14 +215,14 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   }
   std::cout << std::endl;
   //	Матрица X
-  int nAO = basisFunctions.size();
+  std::size_t nAO = basisFunctions.size();
   std_m.X = matrix{nAO};
   double *evec = new double[nAO * nAO];
   double *eval = new double[nAO];
   std_m.S.eigen_vv(evec, eval);
   matrix s{nAO};
-  for (int i = 0; i < nAO; i++) // создание матрицы S^(-0.5)
-    for (int j = 0; j < nAO; j++)
+  for (std::size_t i = 0; i < nAO; i++) // создание матрицы S^(-0.5)
+    for (std::size_t j = 0; j < nAO; j++)
       i != j ? s[i][j] = 0 : s[i][i] = 1.0 / sqrt(eval[i]);
 
   delete[] eval;
@@ -251,7 +251,7 @@ void InputAndMDIntegrals::printBasis() {
       std::cout << "  nZ=" << jt->second.nz << '\n';
       for (vector<pair<double, double>>::iterator kt = jt->second.ai_ci.begin();
            kt != jt->second.ai_ci.end(); kt++)
-        std::cout << "         " << (*kt).first << "  " << (*kt).second << '\n';
+        std::cout << "         " << kt->first << "  " << kt->second << '\n';
     }
   }
 }
@@ -280,7 +280,7 @@ bool InputAndMDIntegrals::set_c2v_z(int *symmAO) {
                      "установлена\n";
         isGood = false;
       }
-      int symm_ = 2 * (jt->second.ny % 2) + ((*jt).second.nx % 2) + 1;
+      int symm_ = 2 * (jt->second.ny % 2) + (jt->second.nx % 2) + 1;
       if (symm == 0)
         symm = symm_;
       if (symm != symm_)

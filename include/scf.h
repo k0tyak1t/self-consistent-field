@@ -41,6 +41,6 @@ protected:
   std::vector<double> mo_energies;
   MO &mo;                  // wtf???
   StandardMatrices &std_m; // wtf??
-  int nAO;
+  std::size_t nAO;
   matrix density, fock, lcao_coefs;
 };

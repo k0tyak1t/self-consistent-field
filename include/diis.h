@@ -28,7 +28,7 @@ public:
   void solve() override;
 
 private:
-  int diis_size;
+  std::size_t diis_size;
   matrix error, extended_diis_product;
   std::deque<matrix> fock_buffer, error_buffer;
   std::vector<double> diis_coefs;

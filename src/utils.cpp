@@ -10,7 +10,7 @@ void print_orbitals(const MO &mo) { std::cout << "\n-- Orbitals --\n" << mo.C; }
 
 void print_energies(const MO &mo) {
   std::cout << "\n-- Final energies --\n";
-  int nAO = mo.C.get_size();
+  int nAO = mo.C.size();
   for (int i = 0; i < nAO; ++i) {
     std::cout << std::setw(8) << std::setprecision(8) << mo.get_mo_energy(i)
               << ' ';

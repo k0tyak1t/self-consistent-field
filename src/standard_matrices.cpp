@@ -7,7 +7,7 @@ StandardMatrices::~StandardMatrices() {
   }
 }
 
-StandardMatrices::StandardMatrices(const unsigned int nAO) : nAO(nAO) {
+StandardMatrices::StandardMatrices(std::size_t nAO) : nAO(nAO) {
   if (!nAO) {
     return;
   }
@@ -19,7 +19,7 @@ StandardMatrices::StandardMatrices(const unsigned int nAO) : nAO(nAO) {
   eri = new double[nAO * nAO * nAO * nAO];
 }
 
-void StandardMatrices::init(const unsigned int n_new) {
+void StandardMatrices::init(std::size_t n_new) {
   if (nAO) {
     throw std::runtime_error("AO already exists!");
   }
@@ -39,9 +39,10 @@ void StandardMatrices::set_total_Vnn(const double new_total_Vnn) {
 
 double StandardMatrices::get_total_Vnn() const { return total_Vnn; }
 
-int StandardMatrices::get_nAO() const { return nAO; }
+std::size_t StandardMatrices::get_nAO() const { return nAO; }
 
-double StandardMatrices::get_eri(int i, int j, int k, int l) const {
+double StandardMatrices::get_eri(std::size_t i, std::size_t j, std::size_t k,
+                                 std::size_t l) const {
   if (((i < 0) || (i >= nAO)) || ((j < 0) || (j >= nAO)) ||
       ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO))) {
     throw std::runtime_error("Failed to access element!");
@@ -50,7 +51,8 @@ double StandardMatrices::get_eri(int i, int j, int k, int l) const {
   return eri[i + nAO * j + nAO * nAO * k + nAO * nAO * nAO * l];
 }
 
-void StandardMatrices::set_eri(int i, int j, int k, int l, double Vijkl) {
+void StandardMatrices::set_eri(std::size_t i, std::size_t j, std::size_t k,
+                               std::size_t l, double Vijkl) {
   if (((i < 0) || (i >= nAO)) || ((j < 0) || (j >= nAO)) ||
       ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO))) {
     throw std::runtime_error("Failed to access element!");
@@ -58,9 +60,9 @@ void StandardMatrices::set_eri(int i, int j, int k, int l, double Vijkl) {
   eri[i + nAO * j + nAO * nAO * k + nAO * nAO * nAO * l] = Vijkl;
 }
 
-int StandardMatrices::get_num_el() const { return num_el; }
+std::size_t StandardMatrices::get_num_el() const { return num_el; }
 
-void StandardMatrices::set_num_el(const unsigned int new_num_el) {
+void StandardMatrices::set_num_el(std::size_t new_num_el) {
   if (new_num_el % 2) {
     throw std::runtime_error(
         "Failed to solve RHF with odd number of electrons!");

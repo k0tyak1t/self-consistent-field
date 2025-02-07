@@ -20,7 +20,7 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
   error = matrix(diis_size);
 
   extended_diis_product = matrix(diis_size + 1);
-  for (int i = 0; i < diis_size; ++i) {
+  for (std::size_t i = 0; i < diis_size; ++i) {
     extended_diis_product[diis_size][i] = -1;
     extended_diis_product[i][diis_size] = -1;
   }
@@ -81,8 +81,8 @@ void DIIS::update_extended_error_product() {
   assert(fock_buffer.size() == static_cast<std::size_t>(diis_size));
   assert(error_buffer.size() == static_cast<std::size_t>(diis_size));
 
-  for (int i = 0; i < diis_size; ++i) {
-    for (int j = 0; j < diis_size; ++j) {
+  for (std::size_t i = 0; i < diis_size; ++i) {
+    for (std::size_t j = 0; j < diis_size; ++j) {
       extended_diis_product[i][j] =
           frobenius_product(error_buffer[i], error_buffer[j]);
     }
@@ -96,7 +96,7 @@ void DIIS::update_diis_coefs() {
   std::vector<int> IPIV(N);
 
   // Initialize RHS: [0, ..., 0, -1]
-  for (int i = 0; i <= diis_size; ++i) {
+  for (std::size_t i = 0; i <= diis_size; ++i) {
     diis_coefs[i] = (diis_size == i) ? -1.0 : 0.0;
   }
 
@@ -113,11 +113,11 @@ void DIIS::update_diis_coefs() {
 
 #if 1
   double sum = 0.0;
-  for (int i = 0; i < diis_size; ++i) {
+  for (std::size_t i = 0; i < diis_size; ++i) {
     sum += diis_coefs[i];
   }
 
-  for (int i = 0; i < diis_size; ++i) {
+  for (std::size_t i = 0; i < diis_size; ++i) {
     diis_coefs[i] /= sum;
   }
 #endif
@@ -132,14 +132,14 @@ void DIIS::update_diis_coefs() {
 
 void DIIS::update_diis_error() {
   error.zeroize();
-  for (int k = 0; k < diis_size; ++k) {
+  for (std::size_t k = 0; k < diis_size; ++k) {
     error += error_buffer[k] * diis_coefs[k];
   }
 }
 
 void DIIS::update_diis_fock() {
   fock.zeroize();
-  for (int k = 0; k < diis_size; ++k) {
+  for (std::size_t k = 0; k < diis_size; ++k) {
     fock += fock_buffer[k] * diis_coefs[k];
   }
 }
@@ -181,6 +181,7 @@ void DIIS::solve() {
 #ifndef NDEBUG
   std::cout << "H core: \n" << std_m.H << std::endl;
 #endif
+#endif
 
   for (int iter = 1; iter <= max_iter; ++iter) {
     if (fabs(cur_energy - prev_energy) < etol) {
@@ -212,4 +213,3 @@ void DIIS::solve() {
 
   std::cout << "DIIS-SCF didn't converge in " << max_iter << " iterations.\n";
 }
-

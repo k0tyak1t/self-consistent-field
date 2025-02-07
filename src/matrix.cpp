@@ -1,6 +1,7 @@
 #include "matrix.h"
 
 #include <cmath>
+#include <cstddef>
 #include <cstring>
 #include <iomanip>
 #include <iostream>
@@ -16,19 +17,41 @@ void dgetri_(int *N, double *A, int *lda, int *IPIV, double *WORK, int *lwork,
              int *INFO);
 }
 
+const double &matrix::RowProxy::operator[](std::size_t i) const {
+  if (i <= n || i < 0)
+    throw std::out_of_range("Column index is out of range!");
+
+  return data_[i];
+}
+
+double &matrix::RowProxy::operator[](std::size_t i) {
+  if (i <= n || i < 0)
+    throw std::out_of_range("Column index is out of range!");
+
+  return data_[i];
+}
+
 // * * * * ------------ * * * * //
 // * * * * constructors * * * * //
 // * * * * ------------ * * * * //
-matrix::matrix() : n(0), data_(nullptr) {}
+matrix::matrix() : n(0), data_(nullptr) {
+#ifndef NDEBUG
+  std::cout << "matrix default initialization.\n";
+#endif
+}
 
-matrix::matrix(std::size_t n_new) : n(n_new) { data_ = new double[n * n]; }
+matrix::matrix(std::size_t n_new) : n(n_new), data_(new double[n * n]{}) {
+#ifndef NDEBUG
+  std::cout << "matrix direct initialization.\n";
+#endif
+}
 
 matrix::matrix(const matrix &other) {
   n = other.n;
   data_ = new double[n * n];
   memcpy(data_, other.data_, n * n * sizeof(double));
 #ifndef NDEBUG
-  std::cout << "matrix created!\n";
+  std::cout << "matrix copy.\n";
 #endif
 }
 
@@ -44,12 +67,28 @@ matrix::~matrix() {
 #endif // NDEBUG
 }
 
+// selectors
+const matrix::RowProxy matrix::operator[](std::size_t i) const {
+  if (n <= i || 0 < i)
+    throw std::out_of_range("Invalid row index!");
+
+  return RowProxy{n, data_ + i * n};
+}
+
+// modifiers
+matrix::RowProxy matrix::operator[](std::size_t i) {
+  if (n <= i || 0 < i)
+    throw std::out_of_range("Invalid row index!");
+
+  return RowProxy{n, data_ + i * n};
+}
+
 // * * * * ********* * * * * //
 // * * * * operators * * * * //
 // * * * * ********* * * * * //
 
 matrix &matrix::operator+=(const matrix &other) {
-  for (auto i = 0; i < n * n; ++i) {
+  for (std::size_t i = 0; i < n * n; ++i) {
     data_[i] += other.data_[i];
   }
 
@@ -63,7 +102,7 @@ matrix matrix::operator+(const matrix &other) {
 }
 
 matrix &matrix::operator-=(const matrix &other) {
-  for (int i = 0; i < n; ++i) {
+  for (std::size_t i = 0; i < n; ++i) {
     data_[i] -= other.data_[i];
   }
   return *this;
@@ -78,10 +117,10 @@ matrix matrix::operator-(const matrix &other) {
 matrix matrix::operator*(const matrix &other) {
   matrix result(n);
 
-  for (int i = 0; i < n; ++i)
-    for (int j = 0; j < n; ++j) {
+  for (std::size_t i = 0; i < n; ++i)
+    for (std::size_t j = 0; j < n; ++j) {
       result[i][j] = 0;
-      for (int k = 0; k < n; ++k)
+      for (std::size_t k = 0; k < n; ++k)
         result[i][j] += (*this)[i][k] * other[k][j];
     }
 
@@ -90,7 +129,7 @@ matrix matrix::operator*(const matrix &other) {
 
 matrix matrix::operator*(const double num) {
   matrix result(n);
-  for (int i = 0; i < n * n; ++i)
+  for (std::size_t i = 0; i < n * n; ++i)
     result.data_[i] *= num;
 
   return result;
@@ -98,8 +137,8 @@ matrix matrix::operator*(const double num) {
 
 matrix matrix::operator/(const double num) {
   matrix result(n);
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < n; ++j) {
+  for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t j = 0; j < n; ++j) {
       result[i][j] /= num;
     }
   }
@@ -125,8 +164,8 @@ void matrix::operator()(int new_size) {
 }
 
 std::ostream &operator<<(std::ostream &os, const matrix &mat) {
-  for (int i = 0; i < mat.n; ++i) {
-    for (int j = 0; j < mat.n; ++j) {
+  for (std::size_t i = 0; i < mat.n; ++i) {
+    for (std::size_t j = 0; j < mat.n; ++j) {
       os << std::setprecision(4) << std::setw(8) << mat[i][j] << " ";
     }
     os << '\n';
@@ -138,9 +177,9 @@ std::vector<double> matrix::operator*(const std::vector<double> &vec) const {
   std::vector<double> result;
 
   double ri = 0;
-  for (int i = 0; i < n; ++i) {
+  for (std::size_t i = 0; i < n; ++i) {
     ri = 0;
-    for (int j = 0; j < n; ++j) {
+    for (std::size_t j = 0; j < n; ++j) {
       ri += (*this)[i][j] * vec[j];
     }
     result.push_back(ri);
@@ -149,7 +188,7 @@ std::vector<double> matrix::operator*(const std::vector<double> &vec) const {
 }
 
 bool matrix::operator==(const matrix &other) {
-  for (int i = 0; i < n * n; ++i) {
+  for (std::size_t i = 0; i < n * n; ++i) {
     if (data_[i] != other.data_[i])
       return false;
   }
@@ -162,7 +201,7 @@ bool matrix::operator==(const matrix &other) {
 // * * * * ---------- * * * * //
 double trace(const matrix &mat) {
   double result = 0;
-  for (int i = 0; i < mat.n; ++i) {
+  for (std::size_t i = 0; i < mat.n; ++i) {
     result += mat[i][i];
   }
   return result;
@@ -170,7 +209,7 @@ double trace(const matrix &mat) {
 
 double matrix::trace() {
   double result = 0;
-  for (int i = 0; i < n; ++i) {
+  for (std::size_t i = 0; i < n; ++i) {
     result += data_[i * (1 + n)];
   }
   return result;
@@ -178,18 +217,18 @@ double matrix::trace() {
 
 double frobenius_product(matrix &mat1, matrix &mat2) {
   double result = 0;
-  for (int i = 0; i < mat1.n; ++i)
-    for (int k = 0; k < mat1.n; ++k)
+  for (std::size_t i = 0; i < mat1.n; ++i)
+    for (std::size_t k = 0; k < mat1.n; ++k)
       result += mat1[k][i] * mat2[k][i];
 
   return result;
 }
 
-matrix matrix::minor(int i, int j) const {
+matrix matrix::minor(std::size_t i, std::size_t j) const {
   matrix result(n - 1);
   int linear_idx = 0;
-  for (int k = 0; k < n; ++k) {
-    for (int l = 0; l < n; ++l) {
+  for (std::size_t k = 0; k < n; ++k) {
+    for (std::size_t l = 0; l < n; ++l) {
       if (k != i && l != j) {
         result.data_[linear_idx] = (*this)[k][l];
         ++linear_idx;
@@ -215,7 +254,7 @@ double det(const matrix &mat) {
 
   double result = 0.0;
 
-  for (int i = 0; i < mat.n; ++i) {
+  for (std::size_t i = 0; i < mat.n; ++i) {
     if (mat[0][i]) {
       result += mat[0][i] * (i % 2 == 0 ? 1 : -1) * det(mat.minor(0, i));
     }
@@ -226,8 +265,8 @@ double det(const matrix &mat) {
 
 matrix matrix::T() {
   matrix result(n);
-  for (int i = 0; i < n; ++i) {
-    for (int j = 0; j < n; ++j) {
+  for (std::size_t i = 0; i < n; ++i) {
+    for (std::size_t j = 0; j < n; ++j) {
       result[i][j] = (*this)[j][i];
     }
   }
@@ -240,18 +279,16 @@ void dsyev_(char *jobz, char *uplo, int *n, double *a, int *lda, double *w,
 }
 
 void matrix::eigen_vv(double *evec, double *eval) {
-  char jobz, uplo;
-  int lwork;
-  int info;
-  if (n == 0) {
+  if (n == 0)
     throw std::runtime_error("Failed to get eigensystem of undefined matrix!");
-  }
-  lwork = 3 * n;
-  double *work = new double[3 * n];
+
+  char jobz = 'V', uplo = 'U';
+  int N = n;
+  int lwork = 3 * N;
+  int info;
+  double *work = new double[3 * N];
   memcpy(evec, this->data(), sizeof(double) * n * n);
-  jobz = 'V';
-  uplo = 'U';
-  dsyev_(&jobz, &uplo, &n, evec, &n, eval, work, &lwork, &info);
+  dsyev_(&jobz, &uplo, &N, evec, &N, eval, work, &lwork, &info);
   if (info != 0) {
     throw std::runtime_error("Failed to diagonalize matrix!\n");
   }
@@ -276,7 +313,7 @@ matrix matrix::inverse() const {
 // * * * * initializers * * * * //
 // * * * * ------------ * * * * //
 void matrix::zeroize() {
-  for (int i = 0; i < n * n; ++i) {
+  for (std::size_t i = 0; i < n * n; ++i) {
     data_[i] = 0;
   }
 }
@@ -291,7 +328,7 @@ int matrix::init(const int n_new) {
 }
 
 void matrix::from_array(const double *src) {
-  memcpy(data_, src, n * n * sizeof(double));
+  std::copy(src, src + n * n, data_);
 }
 
 matrix zero_like(const matrix &other) {
@@ -303,10 +340,3 @@ matrix zero_like(const matrix &other) {
 
   return result;
 }
-
-// * * * * ------------ * * * * //
-// * * * *   getters    * * * * //
-// * * * * ------------ * * * * //
-double *matrix::data() { return data_; }
-
-int matrix::get_size() const { return n; }
