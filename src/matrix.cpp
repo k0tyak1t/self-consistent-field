@@ -47,9 +47,6 @@ matrix::~matrix() {
 // * * * * ********* * * * * //
 // * * * * operators * * * * //
 // * * * * ********* * * * * //
-double *matrix::operator[](int row) { return &data_[row * n]; }
-
-const double *matrix::operator[](int row) const { return &data_[row * n]; }
 
 matrix &matrix::operator+=(const matrix &other) {
   for (auto i = 0; i < n * n; ++i) {

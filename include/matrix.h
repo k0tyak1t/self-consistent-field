@@ -1,5 +1,7 @@
 #ifndef USE_NEW_MATRICES
 #pragma once
+
+#include <cstddef>
 #include <ostream>
 #include <vector>
 
@@ -14,9 +16,20 @@ public:
   matrix(std::size_t, double const *);
   ~matrix();
 
-  // operators
-  double *operator[](int);
-  const double *operator[](int) const;
+public: // static factory methods
+  static matrix zeros(std::size_t);
+  static matrix identity(std::size_t);
+  static matrix zero_like(const matrix &);
+  static matrix identity_like(const matrix &);
+  template <typename It> static matrix from_array(const It &, const It &);
+
+public: // selectors
+  const RowProxy operator[](std::size_t);
+  const double *begin() const { return data_; }
+  const double *end() const { return data_ + n * n; }
+
+public: // modifiers
+public: // operators
   matrix &operator+=(const matrix &);
   matrix operator+(const matrix &);
   matrix &operator-=(const matrix &);
@@ -46,16 +59,21 @@ public:
   void from_array(const double *);
   friend matrix zero_like(const matrix &);
 
-  // ugly getters :)
-  double *data();
-  int get_size() const;
+  // getters
+  double *data() { return data_; }
+  const double *data() const { return data_; }
+  std::size_t size() const { return n; }
 
-private:
+private: // fields
   std::size_t n;
   double *data_;
 
-private:
+private: // proxy for getters
   class RowProxy {
+  public: // constructors and desctuctor
+    RowProxy(std::size_t, double *);
+    ~RowProxy() = default;
+
   public: // selectors
     double operator[](std::size_t) const;
     const double *begin() const;
@@ -66,7 +84,7 @@ private:
     double *begin();
     double *end();
 
-  private:
+  private: // fields
     std::size_t n;
     double *data;
   };
