@@ -33,7 +33,7 @@ all: $(OBJS) $(TARGET)
 
 $(ODIR)/%.o: $(SDIR)/%.cpp
 	@mkdir -p $(@D)
-	$(CXX) $(DEFS_) $(CXXFLAGS) $(LIBS) -c $< -o $@
+	$(CXX) $(DEFS_) $(CXXFLAGS) $(LIBS) -g -c $< -o $@
 
 $(TARGET): $(OBJS)
 	$(CXX) $^ $(LIBS) -o $(TARGET)

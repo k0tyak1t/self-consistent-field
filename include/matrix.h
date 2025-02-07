@@ -10,11 +10,13 @@ class matrix {
 
 public:
   // constructors & destructor
-  matrix();
-  matrix(std::size_t);
-  matrix(const matrix &);
-  matrix(std::size_t, double const *);
-  ~matrix();
+  matrix();               // default constructor
+  matrix(std::size_t);    // direct constructor
+  matrix(const matrix &); // copy constructor
+  matrix(std::size_t,
+         double const *); // TODO: remove dependeces and deprecate;
+  matrix(matrix &&);      // move constructor
+  ~matrix();              // destructor
 
 public: // static factory methods
   static matrix zeros(std::size_t);
@@ -33,29 +35,38 @@ public: // modifiers
   double *begin() { return data_; }
   double *end() { return data_ + n * n; }
 
-public: // operators
+public:                              // assignements
+  matrix &operator=(const matrix &); // copy-assignement
+  matrix &operator=(matrix &&);      // move-assignement
+
+public: // non-const operations
   matrix &operator+=(const matrix &);
-  matrix operator+(const matrix &);
   matrix &operator-=(const matrix &);
-  matrix operator-(const matrix &);
-  matrix operator*(const matrix &);
-  matrix operator*(const double);
-  matrix operator/(const double);
-  matrix &operator=(const matrix &);
-  bool operator==(const matrix &);
-  void operator()(int);
+  matrix &operator*=(double);
+  matrix &operator/=(double);
+
+public: // const operations
+  matrix operator+(const matrix &) const;
+  matrix operator-(const matrix &) const;
+  matrix operator*(const matrix &) const;
+  matrix operator*(double) const;
+  matrix operator/(double) const;
+  bool operator==(const matrix &) const;
+  double trace() const;
+  matrix inverse() const;
+  void eigen_vv(double *, double *) const;
+
+public:                 // operators
+  void operator()(int); // TODO: remove dependeces and deprecate
   friend std::ostream &operator<<(std::ostream &, const matrix &);
-  std::vector<double> operator*(const std::vector<double> &) const;
+  std::vector<double> operator*(const std::vector<double> &)
+      const; // TODO: remove dependeces and deprecate
 
   // operations
-  friend double trace(const matrix &);
-  double trace();
   friend double frobenius_product(matrix &, matrix &);
   matrix minor(std::size_t, std::size_t) const;
   friend double det(const matrix &);
-  matrix T();
-  void eigen_vv(double *, double *);
-  matrix inverse() const;
+  matrix transposed();
 
   // initializers
   void zeroize();

@@ -51,26 +51,34 @@ matrix::matrix(const matrix &other) {
   data_ = new double[n * n];
   memcpy(data_, other.data_, n * n * sizeof(double));
 #ifndef NDEBUG
-  std::cout << "matrix copy.\n";
+  std::cout << "matrix copy initialization.\n";
 #endif
 }
 
 matrix::matrix(std::size_t init_size, double const *init_arr) : n(init_size) {
   data_ = new double[n * n];
-  memcpy(data_, init_arr, n * n * sizeof(double));
+  std::copy(init_arr, init_arr + n * n, data_);
+}
+
+matrix::matrix(matrix &&other) {
+  std::swap(n, other.n);
+  std::swap(data_, other.data_);
+#ifndef NDEBUG
+  std::cout << "matrix move initialization\n";
+#endif
 }
 
 matrix::~matrix() {
   delete[] data_;
 #ifndef NDEBUG
-  std::cout << "matrix destroyed!\n";
+  std::cout << "matrix destructor.\n";
 #endif // NDEBUG
 }
 
 // selectors
 const matrix::RowProxy matrix::operator[](std::size_t i) const {
   if (n <= i || 0 < i)
-    throw std::out_of_range("Invalid row index!");
+    throw std::out_of_range("Row index is out of range!");
 
   return RowProxy{n, data_ + i * n};
 }
@@ -78,14 +86,19 @@ const matrix::RowProxy matrix::operator[](std::size_t i) const {
 // modifiers
 matrix::RowProxy matrix::operator[](std::size_t i) {
   if (n <= i || 0 < i)
-    throw std::out_of_range("Invalid row index!");
+    throw std::out_of_range("Row index is out of range!");
 
   return RowProxy{n, data_ + i * n};
 }
 
-// * * * * ********* * * * * //
-// * * * * operators * * * * //
-// * * * * ********* * * * * //
+matrix &matrix::operator=(matrix &&other) {
+  std::swap(n, other.n);
+  std::swap(data_, other.data_);
+#ifndef NDEBUG
+  std::cout << "matrix move assignement.\n";
+#endif
+  return *this;
+}
 
 matrix &matrix::operator+=(const matrix &other) {
   for (std::size_t i = 0; i < n * n; ++i) {
@@ -95,7 +108,7 @@ matrix &matrix::operator+=(const matrix &other) {
   return *this;
 }
 
-matrix matrix::operator+(const matrix &other) {
+matrix matrix::operator+(const matrix &other) const {
   matrix result = *this;
   result += other;
   return result;
@@ -108,13 +121,13 @@ matrix &matrix::operator-=(const matrix &other) {
   return *this;
 }
 
-matrix matrix::operator-(const matrix &other) {
+matrix matrix::operator-(const matrix &other) const {
   matrix result = *this;
   result -= other;
   return result;
 }
 
-matrix matrix::operator*(const matrix &other) {
+matrix matrix::operator*(const matrix &other) const {
   matrix result(n);
 
   for (std::size_t i = 0; i < n; ++i)
@@ -127,15 +140,15 @@ matrix matrix::operator*(const matrix &other) {
   return result;
 }
 
-matrix matrix::operator*(const double num) {
-  matrix result(n);
-  for (std::size_t i = 0; i < n * n; ++i)
-    result.data_[i] *= num;
+matrix matrix::operator*(double num) const {
+  matrix result = *this;
+  for (auto &i : result)
+    i *= num;
 
   return result;
 }
 
-matrix matrix::operator/(const double num) {
+matrix matrix::operator/(const double num) const {
   matrix result(n);
   for (std::size_t i = 0; i < n; ++i) {
     for (std::size_t j = 0; j < n; ++j) {
@@ -150,15 +163,14 @@ matrix &matrix::operator=(const matrix &other) {
     delete[] data_;
     n = other.n;
     data_ = new double[n * n];
-    memcpy(data_, other.data_, n * n * sizeof(double));
+    std::copy(other.begin(), other.end(), this->begin());
   }
   return *this;
 }
 
 void matrix::operator()(int new_size) {
-  if (n) {
+  if (n)
     delete[] data_;
-  }
   n = new_size;
   data_ = new double[n * n];
 }
@@ -187,7 +199,7 @@ std::vector<double> matrix::operator*(const std::vector<double> &vec) const {
   return result;
 }
 
-bool matrix::operator==(const matrix &other) {
+bool matrix::operator==(const matrix &other) const {
   for (std::size_t i = 0; i < n * n; ++i) {
     if (data_[i] != other.data_[i])
       return false;
@@ -196,18 +208,7 @@ bool matrix::operator==(const matrix &other) {
   return true;
 }
 
-// * * * * ---------- * * * * //
-// * * * * operations * * * * //
-// * * * * ---------- * * * * //
-double trace(const matrix &mat) {
-  double result = 0;
-  for (std::size_t i = 0; i < mat.n; ++i) {
-    result += mat[i][i];
-  }
-  return result;
-}
-
-double matrix::trace() {
+double matrix::trace() const {
   double result = 0;
   for (std::size_t i = 0; i < n; ++i) {
     result += data_[i * (1 + n)];
@@ -216,10 +217,10 @@ double matrix::trace() {
 }
 
 double frobenius_product(matrix &mat1, matrix &mat2) {
-  double result = 0;
-  for (std::size_t i = 0; i < mat1.n; ++i)
-    for (std::size_t k = 0; k < mat1.n; ++k)
-      result += mat1[k][i] * mat2[k][i];
+  double result{};
+  for (auto i1 = mat1.begin(), i2 = mat2.begin();
+       i1 != mat1.end() || i2 != mat1.end(); ++i1, ++i2)
+    result += (*i1) * (*i2);
 
   return result;
 }
@@ -263,7 +264,7 @@ double det(const matrix &mat) {
   return result;
 }
 
-matrix matrix::T() {
+matrix matrix::transposed() {
   matrix result(n);
   for (std::size_t i = 0; i < n; ++i) {
     for (std::size_t j = 0; j < n; ++j) {
@@ -278,7 +279,7 @@ void dsyev_(char *jobz, char *uplo, int *n, double *a, int *lda, double *w,
             double *work, int *lwork, int *info);
 }
 
-void matrix::eigen_vv(double *evec, double *eval) {
+void matrix::eigen_vv(double *evec, double *eval) const {
   if (n == 0)
     throw std::runtime_error("Failed to get eigensystem of undefined matrix!");
 
@@ -287,7 +288,7 @@ void matrix::eigen_vv(double *evec, double *eval) {
   int lwork = 3 * N;
   int info;
   double *work = new double[3 * N];
-  memcpy(evec, this->data(), sizeof(double) * n * n);
+  std::copy(this->begin(), this->end(), evec);
   dsyev_(&jobz, &uplo, &N, evec, &N, eval, work, &lwork, &info);
   if (info != 0) {
     throw std::runtime_error("Failed to diagonalize matrix!\n");

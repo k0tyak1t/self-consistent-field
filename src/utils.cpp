@@ -2,7 +2,9 @@
 
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <ostream>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -35,15 +37,17 @@ void display_progress(int progress, const std::string &leading_str) {
   }
 }
 
-double dot_product(const std::vector<double> &vec_1,
-                   const std::vector<double> &vec_2) {
-  if (vec_1.size() != vec_2.size()) {
-    throw std::runtime_error(
-        "\nFailed to multiply vectors with different length!\n");
-  }
-  double result = 0;
-  for (int i = 0; i < (int)vec_1.size(); ++i) {
-    result += vec_1[i] * vec_2[i];
-  }
-  return result;
+template <typename ItA, typename ItB>
+double dot_product(const ItA &first_start, const ItA &first_end,
+                   const ItB &second_start, const ItB &second_end) {
+  if (std::distance(first_start, first_end) !=
+      std::distance(second_start, second_end))
+    throw std::invalid_argument(
+        "Sizes of containers must be the same to find dot product!");
+  double dot{};
+  for (auto first = first_start, second = second_start; first != first_end;
+       ++first, ++second)
+    dot += first * second;
+
+  return dot;
 }

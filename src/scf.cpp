@@ -34,7 +34,7 @@ void SCF::core_guess() { fock = std_m.H; }
 // F'C' = C'E => C' => C
 void SCF::update_lcao_coefs() {
   transform_matrix(fock).eigen_vv(lcao_coefs.data(), mo_energies.data());
-  lcao_coefs = std_m.X * lcao_coefs.T();
+  lcao_coefs = std_m.X * lcao_coefs.transposed();
 
 #ifndef NDEBUG
   std::cout << "mo energies: ";
@@ -64,11 +64,11 @@ void SCF::update_density() {
 // \frac{1}{2}(\mu\lambda|\sigma\nu)\right]}
 // src: "Modern Quantum Chemistry", p. 141, f-No. 3.154
 void SCF::update_fock() {
-  for (int m = 0; m < nAO; ++m) {
-    for (int n = 0; n < nAO; ++n) {
+  for (std::size_t m = 0; m < nAO; ++m) {
+    for (std::size_t n = 0; n < nAO; ++n) {
       fock[m][n] = std_m.H[m][n];
-      for (int l = 0; l < nAO; ++l) {
-        for (int s = 0; s < nAO; ++s) {
+      for (std::size_t l = 0; l < nAO; ++l) {
+        for (std::size_t s = 0; s < nAO; ++s) {
           fock[m][n] += density[l][s] * (std_m.get_eri(m, n, s, l) -
                                          0.5 * std_m.get_eri(m, l, s, n));
         }
@@ -100,8 +100,8 @@ void SCF::update_energy() {
   prev_energy = cur_energy;
 
   cur_energy = 0;
-  for (int m = 0; m < nAO; ++m) {
-    for (int n = 0; n < nAO; ++n) {
+  for (std::size_t m = 0; m < nAO; ++m) {
+    for (std::size_t n = 0; n < nAO; ++n) {
       cur_energy += density[n][m] * (std_m.H[m][n] + fock[m][n]) / 2;
     }
   }

@@ -230,7 +230,7 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   U.from_array(evec);
   delete[] evec;
   matrix vs{nAO};
-  std_m.X = U.T() * s * U;
+  std_m.X = U.transposed() * s * U;
   return true;
 }
 

@@ -31,7 +31,7 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
 
 void DIIS::update_error() {
   matrix cinv = lcao_coefs.inverse();
-  matrix fock_mo = cinv * fock * cinv.T();
+  matrix fock_mo = cinv * fock * cinv.transposed();
 #if 0
   error = (fock * density * std_m.S) - (std_m.S * density * fock);
 #else
@@ -46,7 +46,7 @@ void DIIS::update_error() {
       error[i][j] = fock_mo[i][j + n_occ];
 
 #ifndef NDEBUG
-  std::cout << "num occ: " << n_occ << " num unocc: " << n_virt << std::endl;
+  std::cout << "Num occ.: " << n_occ << " Num virt.: " << n_virt << std::endl;
 #endif
 #endif
 }
