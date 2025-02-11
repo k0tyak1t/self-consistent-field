@@ -4,6 +4,7 @@
 // ----------------------------------------------------------- //
 
 #include "diis.h"
+#include "matrix.h"
 
 #include <lapacke.h>
 
@@ -17,15 +18,14 @@
 #include <vector>
 
 DIIS::DIIS(MO &mo, StandardMatrices &std_m)
-    : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE) {
+    : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE),
+      extended_diis_product(Matrix{diis_size + 1}) {
   error = Matrix(diis_size);
 
-  extended_diis_product = Matrix(diis_size + 1);
   for (std::size_t i = 0; i < diis_size; ++i) {
     extended_diis_product[diis_size][i] = -1.0;
     extended_diis_product[i][diis_size] = -1.0;
   }
-  extended_diis_product[diis_size][diis_size] = 0.0;
 
   diis_coefs = std::vector<double>(diis_size + 1);
 }
@@ -33,14 +33,13 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
 void DIIS::update_error() {
   Matrix cinv = lcao_coefs.inverse();
   Matrix fock_mo = cinv * fock * cinv.transposed();
-#if 0
+#if 1
   error = (fock * density * std_m.S) - (std_m.S * density * fock);
-#else
+#else // ~0
   std::size_t n_occ = std_m.get_num_el() / 2;
   std::size_t n_virt = std_m.get_nAO() - n_occ;
 
   error = Matrix(std::max(n_occ, n_virt));
-  error.zeroize();
 
   for (auto i = 0u; i < n_occ; ++i)
     for (auto j = 0u; j < n_virt; ++j)
@@ -48,12 +47,12 @@ void DIIS::update_error() {
 
 #ifndef NDEBUG
   std::cout << "num occ.: " << n_occ << " num virt.: " << n_virt << std::endl;
-#endif
-#endif
+#endif // NDEBUG
+#endif // ~0
 }
 
 void DIIS::update_fock_buffer() {
-#ifndef DEBUG
+#ifndef NDEBUG
   std::cout << "[DIIS]: fock buffer update...\n";
 #endif
   if (fock_buffer.empty()) {
@@ -67,13 +66,13 @@ void DIIS::update_fock_buffer() {
   fock_buffer.push_back(fock);
   assert(fock_buffer.end()->data() != fock.data());
 
-#ifndef DEBUG
+#ifndef NDEBUG
   std::cout << "[DIIS]: fock buffer updated.\n";
 #endif
 }
 
 void DIIS::update_error_buffer() {
-#ifndef DEBUG
+#ifndef NDEBUG
   std::cout << "[DIIS]: error buffer update...\n";
 #endif
   if (error_buffer.empty()) {
@@ -86,21 +85,19 @@ void DIIS::update_error_buffer() {
   }
   error_buffer.push_back(error);
   assert(error_buffer.end()->data() != error.data());
-#ifndef DEBUG
+#ifndef NDEBUG
   std::cout << "[DIIS]: error buffer updated.\n";
 #endif
 }
 
 void DIIS::update_extended_error_product() {
-  assert(fock_buffer.size() == static_cast<std::size_t>(diis_size));
-  assert(error_buffer.size() == static_cast<std::size_t>(diis_size));
+  assert(fock_buffer.size() == diis_size);
+  assert(error_buffer.size() == diis_size);
 
-  for (std::size_t i = 0; i < diis_size; ++i) {
-    for (std::size_t j = 0; j < diis_size; ++j) {
+  for (std::size_t i = 0; i < diis_size; ++i)
+    for (std::size_t j = 0; j < diis_size; ++j)
       extended_diis_product[i][j] =
           frobenius_product(error_buffer[i], error_buffer[j]);
-    }
-  }
 }
 
 // solving system: extended_diis_product * diis_coefs = [0, ..., 0, -1]
@@ -127,13 +124,12 @@ void DIIS::update_diis_coefs() {
 
 #if 1
   double sum = 0.0;
-  for (std::size_t i = 0; i < diis_size; ++i) {
+  for (std::size_t i = 0; i < diis_size; ++i)
     sum += diis_coefs[i];
-  }
 
-  for (std::size_t i = 0; i < diis_size; ++i) {
+  for (std::size_t i = 0; i < diis_size; ++i)
     diis_coefs[i] /= sum;
-  }
+
 #endif
 
 #ifndef NDEBUG

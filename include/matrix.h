@@ -9,20 +9,17 @@ class Matrix {
 
 public:
   // constructors & destructor
-  Matrix();               // default constructor
-  Matrix(std::size_t);    // direct constructor
-  Matrix(const Matrix &); // copy constructor
-  Matrix(std::size_t,
-         double const *); // [ TODO: remove dependeces and deprecate]
-  Matrix(Matrix &&);      // move constructor
-  ~Matrix();              // destructor
+  Matrix();                  // default constructor
+  Matrix(const std::size_t); // direct constructor
+  Matrix(const Matrix &);    // copy constructor
+  Matrix(Matrix &&);         // move constructor
+  ~Matrix();                 // destructor
 
 public: // static factory methods
-  static Matrix zeros(std::size_t);
-  static Matrix identity(std::size_t);
+  static Matrix zero(const std::size_t);
+  static Matrix identity(const std::size_t);
   static Matrix zero_like(const Matrix &);
   static Matrix identity_like(const Matrix &);
-  template <typename It> static Matrix from_array(const It &, const It &);
 
 public: // selectors
   const RowProxy operator[](std::size_t) const;
@@ -57,7 +54,6 @@ public: // const operations
   void eigen_vv(double *, double *) const;
 
 public:
-  void operator()(int); // [ TODO: remove dependeces and deprecate]
   friend std::ostream &operator<<(std::ostream &, const Matrix &);
   std::vector<double> operator*(const std::vector<double> &)
       const; // [ TODO: remove dependeces and deprecate]

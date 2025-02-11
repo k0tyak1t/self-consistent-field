@@ -11,7 +11,7 @@ MO::MO(const int n) : n(n) {
 
   mo_energies = new double[n];
   irrep = new int[n];
-  C(n);
+  C = Matrix{static_cast<std::size_t>(n)};
 }
 
 MO::MO() : MO(0) {}

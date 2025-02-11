@@ -53,7 +53,7 @@ Matrix::Matrix() : n(0), data_(nullptr) {
 #endif
 }
 
-Matrix::Matrix(std::size_t n_new) : n(n_new), data_(new double[n * n]{}) {
+Matrix::Matrix(const std::size_t n_new) : n(n_new), data_(new double[n * n]{}) {
 #ifndef NDEBUG
   std::cout << "[matrix]: direct initialization.\n";
 #endif
@@ -66,11 +66,6 @@ Matrix::Matrix(const Matrix &other) {
 #ifndef NDEBUG
   std::cout << "[matrix]: copy initialization.\n";
 #endif
-}
-
-Matrix::Matrix(std::size_t init_size, double const *init_arr) : n(init_size) {
-  data_ = new double[n * n]{};
-  std::copy(init_arr, init_arr + n * n, data_);
 }
 
 Matrix::Matrix(Matrix &&other) {
@@ -194,13 +189,6 @@ Matrix &Matrix::operator=(const Matrix &other) {
   return *this;
 }
 
-void Matrix::operator()(int new_size) { // this shit must die
-  if (n)
-    delete[] data_;
-  n = new_size;
-  data_ = new double[n * n]{};
-}
-
 std::ostream &operator<<(std::ostream &os, const Matrix &mat) {
   for (std::size_t i = 0; i < mat.n; ++i) {
     for (std::size_t j = 0; j < mat.n; ++j) {
@@ -320,7 +308,7 @@ void Matrix::eigen_vv(double *evec, double *eval) const {
 }
 
 Matrix Matrix::inverse() const {
-  Matrix inv = *this;
+  Matrix inv{*this};
   int N = n;
   int *IPIV = new int[n];
   int LWORK = n * n;
@@ -333,19 +321,16 @@ Matrix Matrix::inverse() const {
   return inv;
 }
 
-// * * * * ------------ * * * * //
-// * * * * initializers * * * * //
-// * * * * ------------ * * * * //
+// methods to be dead...
+
 void Matrix::zeroize() {
-  for (std::size_t i = 0; i < n * n; ++i) {
+  for (std::size_t i = 0; i < n * n; ++i)
     data_[i] = 0;
-  }
 }
 
 int Matrix::init(const int n_new) {
-  if (n > 0) {
+  if (n > 0)
     throw std::runtime_error("Matrix already initialized.\n");
-  }
   n = n_new;
   data_ = new double[n * n]{};
   return 0;
@@ -363,4 +348,21 @@ Matrix zero_like(const Matrix &other) {
   }
 
   return result;
+}
+
+// static factory
+
+Matrix Matrix::zero_like(const Matrix &other) { return Matrix{other.n}; }
+
+Matrix Matrix::zero(const std::size_t n) { return Matrix{n}; }
+
+Matrix Matrix::identity(const std::size_t n) {
+  Matrix identity{n};
+  for (auto i = 0u; i < n; ++i)
+    identity[i][i] = 1.0;
+  return identity;
+}
+
+Matrix Matrix::identity_like(const Matrix &reference) {
+  return identity(reference.n);
 }
