@@ -240,11 +240,15 @@ double Matrix::trace() const {
   return result;
 }
 
-double frobenius_product(Matrix &mat1, Matrix &mat2) {
+double frobenius_product(const Matrix &mat1, const Matrix &mat2) {
   double result{};
-  for (auto i1 = mat1.begin(), i2 = mat2.begin();
-       i1 != mat1.end() || i2 != mat1.end(); ++i1, ++i2)
-    result += (*i1) * (*i2);
+  if (mat1.size() != mat2.size())
+    throw std::invalid_argument(
+        "Matrices must have the same number of elements.");
+
+  for (auto i = 0u; i < mat1.n; ++i) {
+    result += mat1.data()[i] * mat2.data()[i];
+  }
 
   return result;
 }

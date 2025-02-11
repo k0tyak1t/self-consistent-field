@@ -11,6 +11,7 @@
 #include <cmath>
 #include <cstddef>
 #include <deque>
+#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
@@ -21,10 +22,10 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
 
   extended_diis_product = Matrix(diis_size + 1);
   for (std::size_t i = 0; i < diis_size; ++i) {
-    extended_diis_product[diis_size][i] = -1;
-    extended_diis_product[i][diis_size] = -1;
+    extended_diis_product[diis_size][i] = -1.0;
+    extended_diis_product[i][diis_size] = -1.0;
   }
-  extended_diis_product[diis_size][diis_size] = 0;
+  extended_diis_product[diis_size][diis_size] = 0.0;
 
   diis_coefs = std::vector<double>(diis_size + 1);
 }
@@ -46,12 +47,15 @@ void DIIS::update_error() {
       error[i][j] = fock_mo[i][j + n_occ];
 
 #ifndef NDEBUG
-  std::cout << "Num occ.: " << n_occ << " Num virt.: " << n_virt << std::endl;
+  std::cout << "num occ.: " << n_occ << " num virt.: " << n_virt << std::endl;
 #endif
 #endif
 }
 
 void DIIS::update_fock_buffer() {
+#ifndef DEBUG
+  std::cout << "[DIIS]: fock buffer update...\n";
+#endif
   if (fock_buffer.empty()) {
     fock_buffer = std::deque<Matrix>{fock};
     assert(fock_buffer.end()->data() != fock.data());
@@ -62,9 +66,16 @@ void DIIS::update_fock_buffer() {
   }
   fock_buffer.push_back(fock);
   assert(fock_buffer.end()->data() != fock.data());
+
+#ifndef DEBUG
+  std::cout << "[DIIS]: fock buffer updated.\n";
+#endif
 }
 
 void DIIS::update_error_buffer() {
+#ifndef DEBUG
+  std::cout << "[DIIS]: error buffer update...\n";
+#endif
   if (error_buffer.empty()) {
     error_buffer = std::deque<Matrix>{error};
     assert(error_buffer.end()->data() != error.data());
@@ -75,6 +86,9 @@ void DIIS::update_error_buffer() {
   }
   error_buffer.push_back(error);
   assert(error_buffer.end()->data() != error.data());
+#ifndef DEBUG
+  std::cout << "[DIIS]: error buffer updated.\n";
+#endif
 }
 
 void DIIS::update_extended_error_product() {
@@ -131,17 +145,29 @@ void DIIS::update_diis_coefs() {
 }
 
 void DIIS::update_diis_error() {
+#ifndef NDIIS
+  std::cout << "[DIIS]: DIIS stage error matrix update...\n";
+#endif
   error.zeroize();
-  for (std::size_t k = 0; k < diis_size; ++k) {
+  for (std::size_t k = 0; k < diis_size; ++k)
     error += error_buffer[k] * diis_coefs[k];
-  }
+
+#ifndef NDIIS
+  std::cout << "[DIIS]: DIIS stage error matrix updated.\n";
+#endif
 }
 
 void DIIS::update_diis_fock() {
+#ifndef NDIIS
+  std::cout << "[DIIS]: DIIS stage fock matrix update...\n";
+#endif
   fock.zeroize();
-  for (std::size_t k = 0; k < diis_size; ++k) {
+  for (std::size_t k = 0; k < diis_size; ++k)
     fock += fock_buffer[k] * diis_coefs[k];
-  }
+
+#ifndef NDIIS
+  std::cout << "[DIIS]: DIIS stage fock matrix updated.\n";
+#endif
 }
 
 #if 0
@@ -179,7 +205,10 @@ void DIIS::solve() {
 void DIIS::solve() {
   core_guess();
 #ifndef NDEBUG
-  std::cout << "H core: \n" << std_m.H << std::endl;
+  std::ofstream log_stream;
+  log_stream.open("logs/hcore.log", std::ios::app);
+  log_stream << "\n\n" << std_m.H << std::endl;
+  log_stream.close();
 #endif
 #endif
 

@@ -63,7 +63,7 @@ public:
       const; // [ TODO: remove dependeces and deprecate]
 
   // operations
-  friend double frobenius_product(Matrix &, Matrix &);
+  friend double frobenius_product(const Matrix &, const Matrix &);
   Matrix minor(std::size_t, std::size_t) const;
   friend double det(const Matrix &);
   Matrix transposed();
