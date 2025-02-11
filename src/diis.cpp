@@ -17,9 +17,9 @@
 
 DIIS::DIIS(MO &mo, StandardMatrices &std_m)
     : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE) {
-  error = matrix(diis_size);
+  error = Matrix(diis_size);
 
-  extended_diis_product = matrix(diis_size + 1);
+  extended_diis_product = Matrix(diis_size + 1);
   for (std::size_t i = 0; i < diis_size; ++i) {
     extended_diis_product[diis_size][i] = -1;
     extended_diis_product[i][diis_size] = -1;
@@ -30,15 +30,15 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
 }
 
 void DIIS::update_error() {
-  matrix cinv = lcao_coefs.inverse();
-  matrix fock_mo = cinv * fock * cinv.transposed();
+  Matrix cinv = lcao_coefs.inverse();
+  Matrix fock_mo = cinv * fock * cinv.transposed();
 #if 0
   error = (fock * density * std_m.S) - (std_m.S * density * fock);
 #else
   std::size_t n_occ = std_m.get_num_el() / 2;
   std::size_t n_virt = std_m.get_nAO() - n_occ;
 
-  error = matrix(std::max(n_occ, n_virt));
+  error = Matrix(std::max(n_occ, n_virt));
   error.zeroize();
 
   for (auto i = 0u; i < n_occ; ++i)
@@ -53,7 +53,7 @@ void DIIS::update_error() {
 
 void DIIS::update_fock_buffer() {
   if (fock_buffer.empty()) {
-    fock_buffer = std::deque<matrix>{fock};
+    fock_buffer = std::deque<Matrix>{fock};
     assert(fock_buffer.end()->data() != fock.data());
     return;
   }
@@ -66,7 +66,7 @@ void DIIS::update_fock_buffer() {
 
 void DIIS::update_error_buffer() {
   if (error_buffer.empty()) {
-    error_buffer = std::deque<matrix>{error};
+    error_buffer = std::deque<Matrix>{error};
     assert(error_buffer.end()->data() != error.data());
     return;
   }
@@ -100,7 +100,7 @@ void DIIS::update_diis_coefs() {
     diis_coefs[i] = (diis_size == i) ? -1.0 : 0.0;
   }
 
-  matrix copy = extended_diis_product;
+  Matrix copy = extended_diis_product;
   int INFO = LAPACKE_dgesv(LAPACK_ROW_MAJOR, N, NRHS, copy.data(), N,
                            IPIV.data(), diis_coefs.data(), N);
 

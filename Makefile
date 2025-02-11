@@ -2,7 +2,7 @@
 SDIR = src
 ODIR = build
 IDIR = include
-LDIR = /usr/lib/x86_64-linux-gnu
+#LDIR = /usr/lib/x86_64-linux-gnu
 
 TARGET = scf.x
 
@@ -11,9 +11,9 @@ ARGS ?= geometry/h2o.xyz basis/6311.basis
 DEFS_ = $(addprefix -D, $(DEFS))
 
 # libraries
+# LIBS_ := lapack lapacke boost_math_c99 blas
 LIBS_ := lapack lapacke boost_math_c99 blas
-LIBS = $(addprefix -l, $(LIBS_)) -L$(LDIR)
-
+LIBS = $(addprefix -l, $(LIBS_))
 # sources & target objects
 SRCS_ := $(shell ls $(SDIR))
 OBJS = $(addprefix $(ODIR)/, $(SRCS_:%.cpp=%.o))

@@ -26,5 +26,5 @@ private: // fields
   double *eri;
 
 public: // fields
-  matrix S, T, H, Ven, X;
+  Matrix S, T, H, Ven, X;
 };

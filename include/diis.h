@@ -29,7 +29,7 @@ public:
 
 private:
   std::size_t diis_size;
-  matrix error, extended_diis_product;
-  std::deque<matrix> fock_buffer, error_buffer;
+  Matrix error, extended_diis_product;
+  std::deque<Matrix> fock_buffer, error_buffer;
   std::vector<double> diis_coefs;
 };

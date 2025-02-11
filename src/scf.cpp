@@ -2,6 +2,7 @@
 
 #include <assert.h>
 #include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -10,15 +11,15 @@ SCF::SCF(MO &mo, StandardMatrices &std_m)
     : etol(DEFAULT_ETOL), max_iter(DEFAULT_MAX_ITER), prev_energy(0.0),
       cur_energy(1.0), mo(mo), std_m(std_m), nAO(std_m.get_nAO()) {
   mo_energies = std::vector<double>(nAO);
-  density = matrix(nAO);
-  fock = matrix(nAO);
-  lcao_coefs = matrix(nAO);
+  density = Matrix(nAO);
+  fock = Matrix(nAO);
+  lcao_coefs = Matrix(nAO);
 }
 
 double SCF::get_total_energy() { return cur_energy + std_m.get_total_Vnn(); }
 
 // A' = XAX^{\dagger}
-matrix SCF::transform_matrix(const matrix &mat) const {
+Matrix SCF::transform_matrix(const Matrix &mat) const {
   return std_m.X * mat * std_m.X;
 }
 
@@ -33,15 +34,21 @@ void SCF::core_guess() { fock = std_m.H; }
 
 // F'C' = C'E => C' => C
 void SCF::update_lcao_coefs() {
+#ifndef NDEBUG
+  std::cout << "[SCF]: lcao coefs update...\n";
+#endif
   transform_matrix(fock).eigen_vv(lcao_coefs.data(), mo_energies.data());
   lcao_coefs = std_m.X * lcao_coefs.transposed();
 
 #ifndef NDEBUG
-  std::cout << "mo energies: ";
+  std::ofstream log_stream;
+  log_stream.open("logs/mo.log", std::ios::app);
+  log_stream << "mo energies: ";
   for (auto i : mo_energies) {
-    std::cout << " " << i;
+    log_stream << " " << i;
   }
-  std::cout << std::endl;
+  log_stream << std::endl;
+  std::cout << "[SCF]: lcao coefs updated.\n";
 #endif
 }
 
@@ -49,6 +56,9 @@ void SCF::update_lcao_coefs() {
 // D_{\mu\nu} = 2 \sum_{a = 1}^{n_{el}/2}{C_{\mu a}C_{\nu a}}
 // src: "Modern Quantum Chemistry", p.139, f-No. 3.145
 void SCF::update_density() {
+#ifndef NDEBUG
+  std::cout << "[SCF]: density matrix update...\n";
+#endif
   for (std::size_t m = 0; m < nAO; ++m) {
     for (std::size_t n = 0; n < nAO; ++n) {
       density[m][n] = 0;
@@ -57,6 +67,9 @@ void SCF::update_density() {
       }
     }
   }
+#ifndef NDEBUG
+  std::cout << "[SCF]: density matrix updated.\n";
+#endif
 }
 
 // F_{\mu\nu} = H^{core}_{\mu\nu} +
@@ -64,6 +77,9 @@ void SCF::update_density() {
 // \frac{1}{2}(\mu\lambda|\sigma\nu)\right]}
 // src: "Modern Quantum Chemistry", p. 141, f-No. 3.154
 void SCF::update_fock() {
+#ifndef NDEBUG
+  std::cout << "[SCF]: fock matrix update...\n";
+#endif
   for (std::size_t m = 0; m < nAO; ++m) {
     for (std::size_t n = 0; n < nAO; ++n) {
       fock[m][n] = std_m.H[m][n];
@@ -76,7 +92,11 @@ void SCF::update_fock() {
     }
   }
 #ifndef NDEBUG
-  std::cout << "Fock matrix: \n" << fock;
+  std::ofstream log_stream;
+  log_stream.open("logs/fock.log", std::ios::app);
+  log_stream << "\n\n" << fock;
+  log_stream.close();
+  std::cout << "[SCF]: fock matrix updated.\n";
 #endif
 }
 
@@ -84,8 +104,7 @@ void SCF::update_fock() {
 // F_{\mu\nu} = H^{core}_{\mu\nu}
 // + \sum_{a=1}^{n_{el}/2}{2(\mu\nu|aa) - (\mu a|a\nu)}
 // src: "Modern Quantum Chemistry", p. 140, f-No. 3.148
-// Fock matrix for restricted Hartree-Fock method
-void SCF::update_fock() {
+// Fock matrix for restricted Hartree-Fock method void SCF::update_fock() {
   for (int m = 0; m < nAO; ++m)
     for (int n = 0; n < nAO; ++n) {
       fock[m][n] = std_m.H[m][n];
@@ -109,8 +128,12 @@ void SCF::update_energy() {
 
 void SCF::solve() {
   core_guess();
+
 #ifndef NDEBUG
-  std::cout << "H core: \n" << std_m.H << std::endl;
+  std::ofstream log_stream;
+  log_stream.open("logs/hcore.log", std::ios::app);
+  log_stream << "\n\n" << std_m.H << std::endl;
+  log_stream.close();
 #endif
 
   for (int iter = 1; iter <= max_iter; ++iter) {
@@ -128,5 +151,5 @@ void SCF::solve() {
     }
   }
 
-  std::cerr << "SCF did not converge in " << max_iter << " iterations.\n";
+  std::cerr << "SCF didn't converge in " << max_iter << " iterations.\n";
 }

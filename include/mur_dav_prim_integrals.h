@@ -2,35 +2,22 @@
 
 class MurDavPrimIntegrals {
 public:
-  double Sij(const int &, const int &, const int &, const double &,
-             const double &, const double &, const double &, const int &,
-             const int &, const int &, const double &, const double &,
-             const double &, const double &);
+  double Sij(int, int, int, double, double, double, double, int, int, int,
+             double, double, double, double);
 
-  double Tij(const int &, const int &, const int &, const double &,
-             const double &, const double &, const double &, const int &,
-             const int &, const int &, const double &, const double &,
-             const double &, const double &);
+  double Tij(int, int, int, double, double, double, double, int, int, int,
+             double, double, double, double);
 
-  double Vij(const int &, const int &, const int &, const double &,
-             const double &, const double &, const double &, const int &,
-             const int &, const int &, const double &, const double &,
-             const double &, const double &, const double &, const double &,
-             const double &);
+  double Vij(int, int, int, double, double, double, double, int, int, int,
+             double, double, double, double, double, double, double);
 
-  double Vijkl(const int &, const int &, const int &, const double &,
-               const double &, const double &, const double &, const int &,
-               const int &, const int &, const double &, const double &,
-               const double &, const double &, const int &, const int &,
-               const int &, const double &, const double &, const double &,
-               const double &, const int &, const int &, const int &,
-               const double &, const double &, const double &, const double &);
+  double Vijkl(int, int, int, double, double, double, double, int, int, int,
+               double, double, double, double, int, int, int, double, double,
+               double, double, int, int, int, double, double, double, double);
 
 private:
-  int calcEijt(double *, const int &, const int &, const double &,
-               const double &, const double &, const double &);
-  int calcEij3(double &, double &, double &, const int &, const int &,
-               const double &, const double &, const double &, const double &);
-  int calcRntuv(double *, const int &, const int &, const int &, const double &,
-                const double &, const double &, const double &);
+  int calcEijt(double *, int, int, double, double, double, double);
+  int calcEij3(double &, double &, double &, int, int, double, double, double,
+               double);
+  int calcRntuv(double *, int, int, int, double, double, double, double);
 };

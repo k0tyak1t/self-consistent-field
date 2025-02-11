@@ -6,7 +6,7 @@ public:
   MO(const int);
   MO();
   ~MO();
-  matrix C; // MO to AO expansion. MO in columns
+  Matrix C; // MO to AO expansion. MO in columns
   double get_mo_energy(const int) const;
   int get_size() const;
   int set_mo_energy(const int, const double);

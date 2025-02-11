@@ -216,20 +216,20 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   std::cout << std::endl;
   //	Матрица X
   std::size_t nAO = basisFunctions.size();
-  std_m.X = matrix{nAO};
+  std_m.X = Matrix{nAO};
   double *evec = new double[nAO * nAO];
   double *eval = new double[nAO];
   std_m.S.eigen_vv(evec, eval);
-  matrix s{nAO};
+  Matrix s{nAO};
   for (std::size_t i = 0; i < nAO; i++) // создание матрицы S^(-0.5)
     for (std::size_t j = 0; j < nAO; j++)
       i != j ? s[i][j] = 0 : s[i][i] = 1.0 / sqrt(eval[i]);
 
   delete[] eval;
-  matrix U{nAO};
+  Matrix U{nAO};
   U.from_array(evec);
   delete[] evec;
-  matrix vs{nAO};
+  Matrix vs{nAO};
   std_m.X = U.transposed() * s * U;
   return true;
 }

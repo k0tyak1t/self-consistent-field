@@ -1,29 +1,28 @@
-#ifndef USE_NEW_MATRICES
 #pragma once
 
 #include <cstddef>
 #include <ostream>
 #include <vector>
 
-class matrix {
+class Matrix {
   class RowProxy;
 
 public:
   // constructors & destructor
-  matrix();               // default constructor
-  matrix(std::size_t);    // direct constructor
-  matrix(const matrix &); // copy constructor
-  matrix(std::size_t,
-         double const *); // TODO: remove dependeces and deprecate;
-  matrix(matrix &&);      // move constructor
-  ~matrix();              // destructor
+  Matrix();               // default constructor
+  Matrix(std::size_t);    // direct constructor
+  Matrix(const Matrix &); // copy constructor
+  Matrix(std::size_t,
+         double const *); // [ TODO: remove dependeces and deprecate]
+  Matrix(Matrix &&);      // move constructor
+  ~Matrix();              // destructor
 
 public: // static factory methods
-  static matrix zeros(std::size_t);
-  static matrix identity(std::size_t);
-  static matrix zero_like(const matrix &);
-  static matrix identity_like(const matrix &);
-  template <typename It> static matrix from_array(const It &, const It &);
+  static Matrix zeros(std::size_t);
+  static Matrix identity(std::size_t);
+  static Matrix zero_like(const Matrix &);
+  static Matrix identity_like(const Matrix &);
+  template <typename It> static Matrix from_array(const It &, const It &);
 
 public: // selectors
   const RowProxy operator[](std::size_t) const;
@@ -35,44 +34,45 @@ public: // modifiers
   double *begin() { return data_; }
   double *end() { return data_ + n * n; }
 
-public:                              // assignements
-  matrix &operator=(const matrix &); // copy-assignement
-  matrix &operator=(matrix &&);      // move-assignement
+public:
+  Matrix &operator=(const Matrix &); // copy-assignment
+  Matrix &operator=(Matrix &&);      // move-assignment
 
 public: // non-const operations
-  matrix &operator+=(const matrix &);
-  matrix &operator-=(const matrix &);
-  matrix &operator*=(double);
-  matrix &operator/=(double);
+  Matrix &operator+=(const Matrix &);
+  Matrix &operator-=(const Matrix &);
+  Matrix &operator*=(double);
+  Matrix &operator/=(double);
+  Matrix transpose(); // in-place transposition
 
 public: // const operations
-  matrix operator+(const matrix &) const;
-  matrix operator-(const matrix &) const;
-  matrix operator*(const matrix &) const;
-  matrix operator*(double) const;
-  matrix operator/(double) const;
-  bool operator==(const matrix &) const;
+  Matrix operator+(const Matrix &) const;
+  Matrix operator-(const Matrix &) const;
+  Matrix operator*(const Matrix &) const;
+  Matrix operator*(double) const;
+  Matrix operator/(double) const;
+  bool operator==(const Matrix &) const;
   double trace() const;
-  matrix inverse() const;
+  Matrix inverse() const;
   void eigen_vv(double *, double *) const;
 
-public:                 // operators
-  void operator()(int); // TODO: remove dependeces and deprecate
-  friend std::ostream &operator<<(std::ostream &, const matrix &);
+public:
+  void operator()(int); // [ TODO: remove dependeces and deprecate]
+  friend std::ostream &operator<<(std::ostream &, const Matrix &);
   std::vector<double> operator*(const std::vector<double> &)
-      const; // TODO: remove dependeces and deprecate
+      const; // [ TODO: remove dependeces and deprecate]
 
   // operations
-  friend double frobenius_product(matrix &, matrix &);
-  matrix minor(std::size_t, std::size_t) const;
-  friend double det(const matrix &);
-  matrix transposed();
+  friend double frobenius_product(Matrix &, Matrix &);
+  Matrix minor(std::size_t, std::size_t) const;
+  friend double det(const Matrix &);
+  Matrix transposed();
 
   // initializers
   void zeroize();
   int init(const int n);
   void from_array(const double *);
-  friend matrix zero_like(const matrix &);
+  friend Matrix zero_like(const Matrix &);
 
   // getters
   double *data() { return data_; }
@@ -104,4 +104,3 @@ private: // proxy for getters
     double *data_;
   };
 };
-#endif

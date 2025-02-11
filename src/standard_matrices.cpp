@@ -12,10 +12,10 @@ StandardMatrices::StandardMatrices(std::size_t nAO) : nAO(nAO) {
     return;
   }
 
-  S = matrix(nAO);
-  T = matrix(nAO);
-  H = matrix(nAO);
-  Ven = matrix(nAO);
+  S = Matrix(nAO);
+  T = Matrix(nAO);
+  H = Matrix(nAO);
+  Ven = Matrix(nAO);
   eri = new double[nAO * nAO * nAO * nAO];
 }
 
@@ -25,11 +25,11 @@ void StandardMatrices::init(std::size_t n_new) {
   }
 
   nAO = n_new;
-  S = matrix{nAO};
-  T = matrix{nAO};
-  H = matrix{nAO};
-  S = matrix{nAO};
-  Ven = matrix{nAO};
+  S = Matrix{nAO};
+  T = Matrix{nAO};
+  H = Matrix{nAO};
+  S = Matrix{nAO};
+  Ven = Matrix{nAO};
   eri = new double[n_new * n_new * n_new * n_new]{};
 }
 

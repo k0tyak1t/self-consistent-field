@@ -21,7 +21,7 @@ public:
   double get_total_energy();
 
   // utilities
-  matrix transform_matrix(const matrix &) const;
+  Matrix transform_matrix(const Matrix &) const;
   void print_iter(int) const;
 
   // helpers
@@ -41,6 +41,6 @@ protected:
   std::vector<double> mo_energies;
   MO &mo;                  // wtf???
   StandardMatrices &std_m; // wtf??
-  std::size_t nAO;
-  matrix density, fock, lcao_coefs;
+  std::size_t nAO{};
+  Matrix density{}, fock{}, lcao_coefs{};
 };
