@@ -190,8 +190,8 @@ Matrix &Matrix::operator=(const Matrix &other) {
 }
 
 std::ostream &operator<<(std::ostream &os, const Matrix &mat) {
-  for (std::size_t i = 0; i < mat.n; ++i) {
-    for (std::size_t j = 0; j < mat.n; ++j) {
+  for (std::size_t i = 0; i < mat.size(); ++i) {
+    for (std::size_t j = 0; j < mat.size(); ++j) {
       os << std::setprecision(4) << std::setw(8) << mat[i][j] << " ";
     }
     os << '\n';
@@ -228,15 +228,14 @@ double Matrix::trace() const {
   return result;
 }
 
-double frobenius_product(const Matrix &mat1, const Matrix &mat2) {
+double Matrix::dot(const Matrix &mat1, const Matrix &mat2) {
   double result{};
   if (mat1.size() != mat2.size())
     throw std::invalid_argument(
         "Matrices must have the same number of elements.");
 
-  for (auto i = 0u; i < mat1.n; ++i) {
+  for (auto i = 0u; i < mat1.n; ++i)
     result += mat1.data()[i] * mat2.data()[i];
-  }
 
   return result;
 }
@@ -254,26 +253,21 @@ Matrix Matrix::minor(std::size_t i, std::size_t j) const {
   return result;
 }
 
-double det(const Matrix &mat) { // good luck with O(n!) complexity :)
-  if (mat.n == 0) {
+double Matrix::det(const Matrix &mat) { // good luck with O(n!) complexity :)
+  if (mat.n == 0)
     return 0;
-  }
 
-  if (mat.n == 1) {
+  if (mat.n == 1)
     return mat[0][0];
-  }
 
-  if (mat.n == 2) {
+  if (mat.n == 2)
     return mat[0][0] * mat[1][1] - mat[1][0] * mat[0][1];
-  }
 
   double result = 0.0;
 
-  for (std::size_t i = 0; i < mat.n; ++i) {
-    if (mat[0][i]) {
+  for (std::size_t i = 0; i < mat.n; ++i)
+    if (mat[0][i])
       result += mat[0][i] * (i % 2 == 0 ? 1 : -1) * det(mat.minor(0, i));
-    }
-  }
 
   return result;
 }
@@ -340,16 +334,6 @@ void Matrix::from_array(const double *src) {
   std::copy(src, src + n * n, data_);
 }
 
-Matrix zero_like(const Matrix &other) {
-  Matrix result = other;
-  int n = other.n;
-  for (int i = 0; i < n * n; ++i) {
-    result.data_[i] = 0;
-  }
-
-  return result;
-}
-
 // static factory
 
 Matrix Matrix::zero_like(const Matrix &other) { return Matrix{other.n}; }
@@ -365,4 +349,12 @@ Matrix Matrix::identity(const std::size_t n) {
 
 Matrix Matrix::identity_like(const Matrix &reference) {
   return identity(reference.n);
+}
+
+// static methods
+
+Matrix Matrix::transposed(const Matrix &matrix) {
+  Matrix transposed = matrix;
+  transposed.transpose();
+  return transposed;
 }

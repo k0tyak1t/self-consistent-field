@@ -52,23 +52,22 @@ public: // const operations
   double trace() const;
   Matrix inverse() const;
   void eigen_vv(double *, double *) const;
+  std::vector<double> operator*(const std::vector<double> &) const;
+
+public: // static functions:
+  static Matrix transposed(const Matrix &);
+  static Matrix inversed(const Matrix &);
+  static double det(const Matrix &);
+  static double dot(const Matrix &, const Matrix &);
 
 public:
-  friend std::ostream &operator<<(std::ostream &, const Matrix &);
-  std::vector<double> operator*(const std::vector<double> &)
-      const; // [ TODO: remove dependeces and deprecate]
-
-  // operations
-  friend double frobenius_product(const Matrix &, const Matrix &);
   Matrix minor(std::size_t, std::size_t) const;
-  friend double det(const Matrix &);
   Matrix transposed();
 
   // initializers
   void zeroize();
   int init(const int n);
   void from_array(const double *);
-  friend Matrix zero_like(const Matrix &);
 
   // getters
   double *data() { return data_; }
@@ -100,3 +99,5 @@ private: // proxy for getters
     double *data_;
   };
 };
+
+std::ostream &operator<<(std::ostream &os, const Matrix &mat);

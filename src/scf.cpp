@@ -38,7 +38,7 @@ void SCF::update_lcao_coefs() {
   std::cout << "[SCF]: lcao coefs update...\n";
 #endif
   transform_matrix(fock).eigen_vv(lcao_coefs.data(), mo_energies.data());
-  lcao_coefs = std_m.X * lcao_coefs.transposed();
+  lcao_coefs = std_m.X * Matrix::transposed(lcao_coefs);
 
 #ifndef NDEBUG
   std::ofstream log_stream;
@@ -59,14 +59,11 @@ void SCF::update_density() {
 #ifndef NDEBUG
   std::cout << "[SCF]: density matrix update...\n";
 #endif
-  for (std::size_t m = 0; m < nAO; ++m) {
-    for (std::size_t n = 0; n < nAO; ++n) {
-      density[m][n] = 0;
-      for (std::size_t a = 0; a < std_m.get_num_el() / 2; ++a) {
+  density = Matrix::zero_like(density);
+  for (std::size_t m = 0; m < nAO; ++m)
+    for (std::size_t n = 0; n < nAO; ++n)
+      for (std::size_t a = 0; a < std_m.get_num_el() / 2; ++a)
         density[m][n] += 2 * lcao_coefs[m][a] * lcao_coefs[n][a];
-      }
-    }
-  }
 #ifndef NDEBUG
   std::cout << "[SCF]: density matrix updated.\n";
 #endif
@@ -80,17 +77,14 @@ void SCF::update_fock() {
 #ifndef NDEBUG
   std::cout << "[SCF]: fock matrix update...\n";
 #endif
-  for (std::size_t m = 0; m < nAO; ++m) {
+  for (std::size_t m = 0; m < nAO; ++m)
     for (std::size_t n = 0; n < nAO; ++n) {
       fock[m][n] = std_m.H[m][n];
-      for (std::size_t l = 0; l < nAO; ++l) {
-        for (std::size_t s = 0; s < nAO; ++s) {
+      for (std::size_t l = 0; l < nAO; ++l)
+        for (std::size_t s = 0; s < nAO; ++s)
           fock[m][n] += density[l][s] * (std_m.get_eri(m, n, s, l) -
                                          0.5 * std_m.get_eri(m, l, s, n));
-        }
-      }
     }
-  }
 #ifndef NDEBUG
   std::ofstream log_stream;
   log_stream.open("logs/fock.log", std::ios::app);
@@ -99,21 +93,6 @@ void SCF::update_fock() {
   std::cout << "[SCF]: fock matrix updated.\n";
 #endif
 }
-
-#if 0
-// F_{\mu\nu} = H^{core}_{\mu\nu}
-// + \sum_{a=1}^{n_{el}/2}{2(\mu\nu|aa) - (\mu a|a\nu)}
-// src: "Modern Quantum Chemistry", p. 140, f-No. 3.148
-// Fock matrix for restricted Hartree-Fock method void SCF::update_fock() {
-  for (int m = 0; m < nAO; ++m)
-    for (int n = 0; n < nAO; ++n) {
-      fock[m][n] = std_m.H[m][n];
-      for (int a = 0; a < std_m.get_num_el() / 2; ++a) {
-        fock[m][n] += 2 * std_m.get_eri(m, n, a, a) - std_m.get_eri(m, a, a, n);
-      }
-    }
-}
-#endif
 
 void SCF::update_energy() {
   prev_energy = cur_energy;
