@@ -1,5 +1,4 @@
 #include "scf.h"
-
 #include <assert.h>
 #include <cmath>
 #include <fstream>
@@ -9,12 +8,8 @@
 
 SCF::SCF(MO &mo, StandardMatrices &std_m)
     : etol(DEFAULT_ETOL), max_iter(DEFAULT_MAX_ITER), prev_energy(0.0),
-      cur_energy(1.0), mo(mo), std_m(std_m), nAO(std_m.get_nAO()) {
-  mo_energies = std::vector<double>(nAO);
-  density = Matrix(nAO);
-  fock = Matrix(nAO);
-  lcao_coefs = Matrix(nAO);
-}
+      cur_energy(1.0), std_m(std_m), nAO(std_m.get_nAO()), mo(mo),
+      mo_energies(nAO), density(nAO), fock(nAO), lcao_coefs(nAO) {}
 
 double SCF::get_total_energy() { return cur_energy + std_m.get_total_Vnn(); }
 

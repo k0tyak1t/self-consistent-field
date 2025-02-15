@@ -19,8 +19,12 @@
 
 DIIS::DIIS(MO &mo, StandardMatrices &std_m)
     : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE),
-      extended_diis_product(Matrix{diis_size + 1}), fock_buffer(diis_size),
-      error_buffer(diis_size), diis_coefs(diis_size + 1) {
+      error(Matrix::zero(diis_size)),
+      extended_diis_product(Matrix{diis_size + 1}),
+      fock_buffer(diis_size, Matrix::zero(diis_size)),
+      error_buffer(diis_size, Matrix::zero(diis_size)),
+      density_buffer(diis_size, Matrix::zero(diis_size)),
+      diis_coefs(diis_size + 1) {
   error = Matrix::zero(diis_size);
 
   for (std::size_t i = 0; i < diis_size; ++i) {
@@ -30,11 +34,11 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
 }
 
 void DIIS::update_error() {
-  Matrix cinv = lcao_coefs.inverse();
-  Matrix fock_mo = cinv * fock * cinv.transposed();
 #if 1
   error = fock * density * std_m.S - std_m.S * density * fock;
 #else
+  Matrix cinv = lcao_coefs.inverse();
+  Matrix fock_mo = cinv * fock * Matrix::transposed(cinv);
   std::size_t n_occ = std_m.get_num_el() / 2;
   std::size_t n_virt = std_m.get_nAO() - n_occ;
 
@@ -50,33 +54,7 @@ void DIIS::update_error() {
 #endif // ~0
 }
 
-void DIIS::update_fock_buffer() {
-#ifndef NDEBUG
-  std::cout << "[DIIS]: fock buffer update...\n";
-#endif
-  fock_buffer.pop_front();
-  fock_buffer.push_back(fock);
-
-#ifndef NDEBUG
-  std::cout << "[DIIS]: fock buffer updated.\n";
-#endif
-}
-
-void DIIS::update_error_buffer() {
-#ifndef NDEBUG
-  std::cout << "[DIIS]: error buffer update...\n";
-#endif
-  error_buffer.pop_front();
-  error_buffer.push_back(error);
-#ifndef NDEBUG
-  std::cout << "[DIIS]: error buffer updated.\n";
-#endif
-}
-
 void DIIS::update_extended_error_product() {
-  assert(fock_buffer.size() == diis_size);
-  assert(error_buffer.size() == diis_size);
-
   for (std::size_t i = 0; i < diis_size; ++i)
     for (std::size_t j = 0; j < diis_size; ++j)
       extended_diis_product[i][j] =
@@ -153,6 +131,12 @@ void DIIS::update_diis_fock() {
 #endif
 }
 
+void DIIS::update_diis_density() {
+  density = Matrix::zero_like(density);
+  for (auto i = 0u; i < diis_size; ++i)
+    density += density_buffer[i] * diis_coefs[i];
+}
+
 void DIIS::solve() {
   core_guess();
 #ifndef NDEBUG
@@ -178,6 +162,7 @@ void DIIS::solve() {
       update_diis_coefs();
       update_diis_fock();
       update_diis_error();
+      update_diis_density();
     }
 
     else {
@@ -185,8 +170,10 @@ void DIIS::solve() {
       update_error();
     }
 
-    update_fock_buffer();
-    update_error_buffer();
+    fock_buffer.update(fock);
+    error_buffer.update(error);
+    density_buffer.update(density);
+
     update_energy();
     print_iter(iter);
   }

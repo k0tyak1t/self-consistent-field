@@ -8,7 +8,6 @@
 #include <ostream>
 #include <stdexcept>
 #include <vector>
-#define CHECK_RANGES 1
 
 extern "C" {
 // LU decomoposition of a general matrix
@@ -19,69 +18,43 @@ void dgetri_(int *N, double *A, int *lda, int *IPIV, double *WORK, int *lwork,
 }
 
 const double &Matrix::RowProxy::operator[](std::size_t i) const {
-#ifndef NDEBUG
-#if CHECK_RANGES
   if (i >= n || i < 0)
     throw std::out_of_range("Column index is out of range! " +
                             std::to_string(i) + " > " + std::to_string(n) +
                             '\n');
 
-#endif // CHECK_RANGES
-#endif // NDEBUG
   return data_[i];
 }
 
 double &Matrix::RowProxy::operator[](std::size_t i) {
-#ifndef NDEBUG
-#if CHECK_RANGES
   if (i >= n || i < 0)
     throw std::out_of_range("Column index is out of range! " +
                             std::to_string(i) + " > " + std::to_string(n) +
                             '\n');
 
-#endif // CHECK_RANGES
-#endif // NDEBUG
   return data_[i];
 }
 
 // * * * * ------------ * * * * //
 // * * * * constructors * * * * //
 // * * * * ------------ * * * * //
-Matrix::Matrix() : n(0), data_(nullptr) {
-#ifndef NDEBUG
-  std::cout << "[matrix]: default initialization.\n";
-#endif
-}
+Matrix::Matrix() : n(0), data_(nullptr) {}
 
-Matrix::Matrix(const std::size_t n_new) : n(n_new), data_(new double[n * n]{}) {
-#ifndef NDEBUG
-  std::cout << "[matrix]: direct initialization.\n";
-#endif
-}
+Matrix::Matrix(const std::size_t n_new)
+    : n(n_new), data_(new double[n * n]{}) {}
 
 Matrix::Matrix(const Matrix &other) {
   n = other.n;
   data_ = new double[n * n]{};
   std::copy(other.begin(), other.end(), data_);
-#ifndef NDEBUG
-  std::cout << "[matrix]: copy initialization.\n";
-#endif
 }
 
 Matrix::Matrix(Matrix &&other) {
   std::swap(n, other.n);
   std::swap(data_, other.data_);
-#ifndef NDEBUG
-  std::cout << "[matrix]: move initialization\n";
-#endif
 }
 
-Matrix::~Matrix() {
-#ifndef NDEBUG
-  std::cout << "[matrix]: destructor.\n";
-#endif // NDEBUG
-  delete[] data_;
-}
+Matrix::~Matrix() { delete[] data_; }
 
 // selectors
 const Matrix::RowProxy Matrix::operator[](std::size_t i) const {
@@ -100,9 +73,6 @@ Matrix::RowProxy Matrix::operator[](std::size_t i) {
 }
 
 Matrix &Matrix::operator=(Matrix &&other) {
-#ifndef NDEBUG
-  std::cout << "[matrix]: move assignment.\n";
-#endif
 
   if (this == &other)
     return *this;
@@ -269,12 +239,6 @@ double Matrix::det(const Matrix &mat) { // good luck with O(n!) complexity :)
     if (mat[0][i])
       result += mat[0][i] * (i % 2 == 0 ? 1 : -1) * det(mat.minor(0, i));
 
-  return result;
-}
-
-Matrix Matrix::transposed() {
-  Matrix result = *this;
-  result.transpose();
   return result;
 }
 

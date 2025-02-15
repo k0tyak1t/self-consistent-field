@@ -1,5 +1,6 @@
 #pragma once
 
+#include "matrix_buffer.h"
 #include "scf.h"
 #include "standard_matrices.h"
 #include <deque>
@@ -17,20 +18,18 @@ public: // pre-diis stage
   void update_error();
 
 public: // diis stage
-  void update_fock_buffer();
-  void update_error_buffer();
   void update_extended_error_product();
   void update_diis_coefs();
   void update_diis_error();
   void update_diis_fock();
+  void update_diis_density();
 
   // solver
   void solve() override;
 
 private:
-  std::size_t diis_size = DEFAULT_DIIS_SIZE;
+  std::size_t diis_size;
   Matrix error, extended_diis_product;
-  std::deque<Matrix> fock_buffer, error_buffer,
-      density_buffer; // TODO: refactor buffers
+  Buffer<Matrix> fock_buffer, error_buffer, density_buffer;
   std::vector<double> diis_coefs;
 };

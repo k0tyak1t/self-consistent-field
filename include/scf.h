@@ -36,11 +36,11 @@ public:
 
 protected:
   double etol;
-  int max_iter;
+  unsigned max_iter;
   double prev_energy, cur_energy;
-  std::vector<double> mo_energies;
-  MO &mo;
   StandardMatrices &std_m;
-  std::size_t nAO{};
-  Matrix density{}, fock{}, lcao_coefs{};
+  std::size_t nAO;
+  MO &mo;
+  std::vector<double> mo_energies;
+  Matrix density, fock, lcao_coefs;
 };

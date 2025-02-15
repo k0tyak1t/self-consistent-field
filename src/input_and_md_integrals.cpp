@@ -228,7 +228,7 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   U.from_array(evec);
   delete[] evec;
   Matrix vs{nAO};
-  std_m.X = U.transposed() * s * U;
+  std_m.X = Matrix::transposed(U) * s * U;
   return true;
 }
 

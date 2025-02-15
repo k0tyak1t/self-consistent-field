@@ -62,7 +62,6 @@ public: // static functions:
 
 public:
   Matrix minor(std::size_t, std::size_t) const;
-  Matrix transposed();
 
   // initializers
   void zeroize();
