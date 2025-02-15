@@ -39,8 +39,12 @@ $(TARGET): $(OBJS)
 	$(CXX) $^ $(LIBS) -o $(TARGET)
 
 clean:
-	@rm -rf $(ODIR) $(TARGET) 2>/dev/null
+	@rm -rf $(ODIR) $(TARGET)
 	@echo "Project cleaned!"
 
 run: $(TARGET)
 	./$(TARGET) $(ARGS)
+
+clean-log:
+	@rm -f logs/*
+	@echo "Logs cleaned!"

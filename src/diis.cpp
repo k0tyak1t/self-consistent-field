@@ -6,7 +6,6 @@
 #include "diis.h"
 #include "matrix.h"
 
-#include <algorithm>
 #include <lapacke.h>
 
 #include <assert.h>
@@ -21,7 +20,7 @@
 DIIS::DIIS(MO &mo, StandardMatrices &std_m)
     : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE),
       extended_diis_product(Matrix{diis_size + 1}) {
-  error = Matrix(diis_size);
+  error = Matrix::zero(diis_size);
 
   for (std::size_t i = 0; i < diis_size; ++i) {
     extended_diis_product[diis_size][i] = 1.0;
@@ -35,12 +34,12 @@ void DIIS::update_error() {
   Matrix cinv = lcao_coefs.inverse();
   Matrix fock_mo = cinv * fock * cinv.transposed();
 #if 1
-  error = (fock * density * std_m.S) - (std_m.S * density * fock);
-#else // ~0
+  error = fock * density * std_m.S - std_m.S * density * fock;
+#else
   std::size_t n_occ = std_m.get_num_el() / 2;
   std::size_t n_virt = std_m.get_nAO() - n_occ;
 
-  error = Matrix{std::max(n_occ, n_virt)};
+  error = Matrix{n_occ > n_virt ? n_occ : n_virt};
 
   for (auto i = 0u; i < n_occ; ++i)
     for (auto j = 0u; j < n_virt; ++j)
@@ -116,14 +115,13 @@ void DIIS::update_diis_coefs() {
                              std::to_string(INFO) +
                              ", matrix size = " + std::to_string(N));
 
-#if 1 // normalization
-  double sum = 0.0;
+#ifndef NNORMALIZE // normalization
+  double sum{};
   for (std::size_t i = 0; i < diis_size; ++i)
     sum += diis_coefs[i];
 
   for (std::size_t i = 0; i < diis_size; ++i)
     diis_coefs[i] /= sum;
-
 #endif
 
 #ifndef NDEBUG
@@ -135,27 +133,27 @@ void DIIS::update_diis_coefs() {
 }
 
 void DIIS::update_diis_error() {
-#ifndef NDIIS
+#ifndef NDEBUG
   std::cout << "[DIIS]: DIIS stage error matrix update...\n";
 #endif
   error = Matrix::zero_like(error);
   for (std::size_t k = 0; k < diis_size; ++k)
     error += error_buffer[k] * diis_coefs[k];
 
-#ifndef NDIIS
+#ifndef NDEBUG
   std::cout << "[DIIS]: DIIS stage error matrix updated.\n";
 #endif
 }
 
 void DIIS::update_diis_fock() {
-#ifndef NDIIS
+#ifndef NDEBUG
   std::cout << "[DIIS]: DIIS stage fock matrix update...\n";
 #endif
   fock = Matrix::zero_like(fock);
   for (std::size_t k = 0; k < diis_size; ++k)
     fock += fock_buffer[k] * diis_coefs[k];
 
-#ifndef NDIIS
+#ifndef NDEBUG
   std::cout << "[DIIS]: DIIS stage fock matrix updated.\n";
 #endif
 }

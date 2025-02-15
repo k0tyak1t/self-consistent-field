@@ -1,13 +1,24 @@
 # SCF
 
-## Dependicies:
-1. lapack
-2. boost math c99
-   
-## How to use:
-1. Save geometry file in .xyz format to the deometry/ dir
+<!--toc:start-->
+- [SCF](#scf)
+  - [Dependencies](#dependencies)
+  - [How to use](#how-to-use)
+    - [Geometry example](#geometry-example)
+    - [Basis example](#basis-example)
+<!--toc:end-->
 
-for example one can use water geometry:
+## Dependencies
+
+1) lapack
+2) boost math c99
+
+## How to use
+
+1. Save geometry file in .xyz format
+
+### Geometry example
+
 ```
 3
 H2O (blah blah, comment string)
@@ -16,9 +27,10 @@ H    3.0   0.0  0.0
 O    1.5   0.5  0.0
 ```
 
-2. Save basis in GAMESS-US format to the basis/ dir (without $- keys)
+2. Save basis in GAMESS-US format
 
-for example one can use cc-pVDZ basis:
+### Basis example
+
 ```
 HYDROGEN
 S   4
@@ -65,20 +77,18 @@ D   1
 1         1.185000E+00           1.0000000
 ```
 
-3. Build project
+3. Build project using Makefile
 
-For example, one can use following script:
+```
+# use DIIS
+make -j4
 
-(run.sh)
+# without DIIS
+make -j4 DEFS=NDIIS
 ```
-#!/bin/sh
-mkdir -p compiled geometry basis
-rm -f compiled/scf.out
-g++ src/*.cpp -Iinclude -llapack -lboost_math_c99 -o compiled/scf.out -Wall -pedantic -O3
-time ./compiled/scf.out geometry/h2o.xyz basis/cc-pVDZ.basis
-exit 0
+
+4. How to run
+
 ```
-```
-chmod +x run.sh
-./run.sh
+./scf.x path/to/geometry.xyz path/to/basis.basis
 ```

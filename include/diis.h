@@ -10,13 +10,13 @@
 #endif
 
 class DIIS : public SCF {
-public:
+public: // constructor
   DIIS(MO &, StandardMatrices &);
 
-  // pre-diis
+public: // pre-diis stage
   void update_error();
 
-  // diis
+public: // diis stage
   void update_fock_buffer();
   void update_error_buffer();
   void update_extended_error_product();

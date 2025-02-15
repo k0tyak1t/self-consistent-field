@@ -20,6 +20,12 @@ void print_energies(const MO &mo) {
   std::cout << "\nTotal_energy = " << mo.get_total_energy() << '\n';
 }
 
+/**
+ * @brief print progress bar to the screen
+ *
+ * @param progress progress state for progress bar
+ * @param leading_str string before prgoress bar
+ */
 void display_progress(const int progress, const std::string &leading_str) {
   int progress_bar_width = 30;
   int cursor_position = progress_bar_width * progress / 100;
