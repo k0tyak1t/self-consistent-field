@@ -1,5 +1,4 @@
 #pragma once
-#include "matrix.h"
 #include <deque>
 
 template <typename T> struct Buffer : public std::deque<T> {

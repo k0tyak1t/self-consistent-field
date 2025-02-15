@@ -11,7 +11,6 @@
 #include <assert.h>
 #include <cmath>
 #include <cstddef>
-#include <deque>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>

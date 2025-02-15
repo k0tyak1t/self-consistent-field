@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix_buffer.h"
+#include "buffer.h"
 #include "scf.h"
 #include "standard_matrices.h"
 #include <deque>

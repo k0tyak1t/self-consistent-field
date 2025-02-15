@@ -8,6 +8,7 @@ TARGET = scf.x
 
 ARGS ?= geometry/h2o.xyz basis/6311.basis
 
+DEFS ?= NDEBUG
 DEFS_ = $(addprefix -D, $(DEFS))
 
 # libraries
