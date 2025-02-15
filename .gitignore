@@ -11,3 +11,5 @@ key.pub
 *.sh
 *.x
 *.bak
+CMakeFiles/
+CMakeCache.txt
