@@ -7,22 +7,13 @@ StandardMatrices::~StandardMatrices() {
   }
 }
 
-StandardMatrices::StandardMatrices(std::size_t nAO) : nAO(nAO) {
-  if (!nAO) {
-    return;
-  }
-
-  S = Matrix(nAO);
-  T = Matrix(nAO);
-  H = Matrix(nAO);
-  Ven = Matrix(nAO);
-  eri = new double[nAO * nAO * nAO * nAO];
-}
+StandardMatrices::StandardMatrices(std::size_t nAO)
+    : nAO(nAO), S(Matrix{nAO}), T(Matrix{nAO}), H(Matrix{nAO}),
+      Ven(Matrix{nAO}), eri(new double[nAO * nAO * nAO * nAO]{}) {}
 
 void StandardMatrices::init(std::size_t n_new) {
-  if (nAO) {
+  if (nAO)
     throw std::runtime_error("AO already exists!");
-  }
 
   nAO = n_new;
   S = Matrix{nAO};
@@ -44,9 +35,8 @@ std::size_t StandardMatrices::get_nAO() const { return nAO; }
 double StandardMatrices::get_eri(std::size_t i, std::size_t j, std::size_t k,
                                  std::size_t l) const {
   if (((i < 0) || (i >= nAO)) || ((j < 0) || (j >= nAO)) ||
-      ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO))) {
+      ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO)))
     throw std::runtime_error("Failed to access element!");
-  }
 
   return eri[i + nAO * j + nAO * nAO * k + nAO * nAO * nAO * l];
 }
@@ -54,19 +44,18 @@ double StandardMatrices::get_eri(std::size_t i, std::size_t j, std::size_t k,
 void StandardMatrices::set_eri(std::size_t i, std::size_t j, std::size_t k,
                                std::size_t l, double Vijkl) {
   if (((i < 0) || (i >= nAO)) || ((j < 0) || (j >= nAO)) ||
-      ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO))) {
+      ((k < 0) || (k >= nAO)) || ((l < 0) || (l >= nAO)))
     throw std::runtime_error("Failed to access element!");
-  }
+
   eri[i + nAO * j + nAO * nAO * k + nAO * nAO * nAO * l] = Vijkl;
 }
 
 std::size_t StandardMatrices::get_num_el() const { return num_el; }
 
 void StandardMatrices::set_num_el(std::size_t new_num_el) {
-  if (new_num_el % 2) {
+  if (new_num_el % 2)
     throw std::runtime_error(
         "Failed to solve RHF with odd number of electrons!");
-  }
 
   num_el = new_num_el;
 }

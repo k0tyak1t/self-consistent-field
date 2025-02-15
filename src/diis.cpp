@@ -19,15 +19,14 @@
 
 DIIS::DIIS(MO &mo, StandardMatrices &std_m)
     : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE),
-      extended_diis_product(Matrix{diis_size + 1}) {
+      extended_diis_product(Matrix{diis_size + 1}), fock_buffer(diis_size),
+      error_buffer(diis_size), diis_coefs(diis_size + 1) {
   error = Matrix::zero(diis_size);
 
   for (std::size_t i = 0; i < diis_size; ++i) {
     extended_diis_product[diis_size][i] = 1.0;
     extended_diis_product[i][diis_size] = 1.0;
   }
-
-  diis_coefs = std::vector<double>(diis_size + 1);
 }
 
 void DIIS::update_error() {
@@ -55,9 +54,7 @@ void DIIS::update_fock_buffer() {
 #ifndef NDEBUG
   std::cout << "[DIIS]: fock buffer update...\n";
 #endif
-  if (fock_buffer.size() == diis_size) {
-    fock_buffer.pop_front();
-  }
+  fock_buffer.pop_front();
   fock_buffer.push_back(fock);
 
 #ifndef NDEBUG
@@ -69,9 +66,7 @@ void DIIS::update_error_buffer() {
 #ifndef NDEBUG
   std::cout << "[DIIS]: error buffer update...\n";
 #endif
-  if (error_buffer.size() == diis_size) {
-    error_buffer.pop_front();
-  }
+  error_buffer.pop_front();
   error_buffer.push_back(error);
 #ifndef NDEBUG
   std::cout << "[DIIS]: error buffer updated.\n";
@@ -106,7 +101,7 @@ void DIIS::update_diis_coefs() {
   diis_coefs[diis_size] = 1.0;
 
   Matrix copy{extended_diis_product};
-  int INFO = LAPACKE_dgesv(LAPACK_COL_MAJOR, N, NRHS, copy.data(), N,
+  int INFO = LAPACKE_dgesv(LAPACK_ROW_MAJOR, N, NRHS, copy.data(), N,
                            IPIV.data(), diis_coefs.data(), N);
 
   if (INFO != 0)
@@ -178,17 +173,18 @@ void DIIS::solve() {
     update_lcao_coefs();
     update_density();
 
-    if (fock_buffer.size() == diis_size) {
+    if (iter > diis_size) {
       update_extended_error_product();
       update_diis_coefs();
       update_diis_fock();
       update_diis_error();
     }
 
-    if (fock_buffer.size() < diis_size) {
+    else {
       update_fock();
       update_error();
     }
+
     update_fock_buffer();
     update_error_buffer();
     update_energy();

@@ -26,15 +26,13 @@ bool InputAndMDIntegrals::readGeom(char *filename) {
     cur_atom.y *= ANGSTROM_TO_BOHR;
     cur_atom.z *= ANGSTROM_TO_BOHR;
     cur_atom.q = get_nuclear_charge(cur_str);
-    if (cur_atom.q == 0) {
+    if (cur_atom.q == 0)
       throw std::runtime_error("Incorrect atom.");
-    }
     atoms.push_back(cur_atom);
   }
   inp.close();
-  if (num_atoms != int(atoms.size())) {
+  if (num_atoms != int(atoms.size()))
     throw std::runtime_error("Incorrect number of atoms.");
-  }
   return true;
 }
 

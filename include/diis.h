@@ -28,8 +28,9 @@ public: // diis stage
   void solve() override;
 
 private:
-  std::size_t diis_size;
+  std::size_t diis_size = DEFAULT_DIIS_SIZE;
   Matrix error, extended_diis_product;
-  std::deque<Matrix> fock_buffer{}, error_buffer{};
+  std::deque<Matrix> fock_buffer, error_buffer,
+      density_buffer; // TODO: refactor buffers
   std::vector<double> diis_coefs;
 };
