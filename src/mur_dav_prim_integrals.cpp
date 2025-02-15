@@ -2,9 +2,8 @@
 
 #include <boost/math/special_functions/erf.hpp>
 
-int MurDavPrimIntegrals::calcEijt(double *E, const int &imax, const int &jmax,
-                                  const double &p, const double &mu,
-                                  const double &xPA, const double &xPB) {
+int MurDavPrimIntegrals::calcEijt(double *E, int imax, int jmax, double p,
+                                  double mu, double xPA, double xPB) {
   int tmax = imax + jmax + 1;
   double *Etmp = new double[tmax * tmax];
 
@@ -14,35 +13,31 @@ int MurDavPrimIntegrals::calcEijt(double *E, const int &imax, const int &jmax,
 
   Etmp[0] = exp(-mu * (xPA - xPB) * (xPA - xPB));
 
-  for (int i = 0; i < imax; i++) {
+  for (int i = 0; i < imax; i++)
     for (int t = 0; t <= i; t++) {
       Etmp[(i + 1) * tmax + t] += Etmp[i * tmax + t] * xPA;
       Etmp[(i + 1) * tmax + t + 1] += Etmp[i * tmax + t] * 0.5 / p;
       Etmp[(i + 1) * tmax + t - 1] += Etmp[i * tmax + t] * t;
     }
-  }
 
-  for (int j = 0; j < jmax; j++) {
+  for (int j = 0; j < jmax; j++)
     for (int t = 0; t <= (j + imax); t++) {
       Etmp[(imax + j + 1) * tmax + t] += Etmp[(imax + j) * tmax + t] * xPB;
       Etmp[(imax + j + 1) * tmax + t + 1] +=
           Etmp[(imax + j) * tmax + t] * 0.5 / p;
       Etmp[(imax + j + 1) * tmax + t - 1] += Etmp[(imax + j) * tmax + t] * t;
     }
-  }
 
-  for (int t = 0; t < tmax; t++) {
+  for (int t = 0; t < tmax; t++)
     E[t] = Etmp[tmax * tmax - tmax + t];
-  }
 
   delete[] Etmp;
   return 0;
 }
 
 int MurDavPrimIntegrals::calcEij3(double &Eij, double &Eij2p, double &Eij2m,
-                                  const int &imax, const int &jmax,
-                                  const double &p, const double &mu,
-                                  const double &xPA, const double &xPB) {
+                                  int imax, int jmax, double p, double mu,
+                                  double xPA, double xPB) {
   int tmax = imax + jmax + 3;
   double *Etmp = new double[tmax * tmax];
 
@@ -77,10 +72,9 @@ int MurDavPrimIntegrals::calcEij3(double &Eij, double &Eij2p, double &Eij2m,
   return 0;
 }
 
-int MurDavPrimIntegrals::calcRntuv(double *R, const int &tmax, const int &umax,
-                                   const int &vmax, const double &p,
-                                   const double &xPA, const double &yPA,
-                                   const double &zPA) {
+int MurDavPrimIntegrals::calcRntuv(double *R, int tmax, int umax, int vmax,
+                                   double p, double xPA, double yPA,
+                                   double zPA) {
   const int nmax = tmax + umax + vmax;
   const int ndim = (tmax + 1) * (umax + 1) * (vmax + 1);
   const int tdim = (umax + 1) * (vmax + 1);
@@ -149,12 +143,10 @@ int MurDavPrimIntegrals::calcRntuv(double *R, const int &tmax, const int &umax,
   return 0;
 }
 
-double MurDavPrimIntegrals::Sij(const int &nx1, const int &ny1, const int &nz1,
-                                const double &x1, const double &y1,
-                                const double &z1, const double &alpha1,
-                                const int &nx2, const int &ny2, const int &nz2,
-                                const double &x2, const double &y2,
-                                const double &z2, const double &alpha2) {
+double MurDavPrimIntegrals::Sij(int nx1, int ny1, int nz1, double x1, double y1,
+                                double z1, double alpha1, int nx2, int ny2,
+                                int nz2, double x2, double y2, double z2,
+                                double alpha2) {
   const double p = alpha1 + alpha2;
   const double mu = alpha1 * alpha2 / p;
   const double xp = (alpha1 * x1 + alpha2 * x2) / p;
@@ -173,12 +165,10 @@ double MurDavPrimIntegrals::Sij(const int &nx1, const int &ny1, const int &nz1,
   return S;
 }
 
-double MurDavPrimIntegrals::Tij(const int &nx1, const int &ny1, const int &nz1,
-                                const double &x1, const double &y1,
-                                const double &z1, const double &alpha1,
-                                const int &nx2, const int &ny2, const int &nz2,
-                                const double &x2, const double &y2,
-                                const double &z2, const double &alpha2) {
+double MurDavPrimIntegrals::Tij(int nx1, int ny1, int nz1, double x1, double y1,
+                                double z1, double alpha1, int nx2, int ny2,
+                                int nz2, double x2, double y2, double z2,
+                                double alpha2) {
   const double p = alpha1 + alpha2;
   const double mu = alpha1 * alpha2 / p;
   const double xp = (alpha1 * x1 + alpha2 * x2) / p;
@@ -197,14 +187,11 @@ double MurDavPrimIntegrals::Tij(const int &nx1, const int &ny1, const int &nz1,
   return (T_ij * S_kl * S_mn + S_ij * T_kl * S_mn + S_ij * S_kl * T_mn) *
          pow(acos(0.0) * 2.0 / p, 1.5);
 }
-double MurDavPrimIntegrals::Vij(const int &nx1, const int &ny1, const int &nz1,
-                                const double &x1, const double &y1,
-                                const double &z1, const double &alpha1,
-                                const int &nx2, const int &ny2, const int &nz2,
-                                const double &x2, const double &y2,
-                                const double &z2, const double &alpha2,
-                                const double &xq, const double &yq,
-                                const double &zq) {
+double MurDavPrimIntegrals::Vij(int nx1, int ny1, int nz1, double x1, double y1,
+                                double z1, double alpha1, int nx2, int ny2,
+                                int nz2, double x2, double y2, double z2,
+                                double alpha2, double xq, double yq,
+                                double zq) {
   const double p = alpha1 + alpha2;
   const double mu = alpha1 * alpha2 / p;
   const double xp = (alpha1 * x1 + alpha2 * x2) / p;
@@ -239,14 +226,10 @@ double MurDavPrimIntegrals::Vij(const int &nx1, const int &ny1, const int &nz1,
 }
 
 double MurDavPrimIntegrals::Vijkl(
-    const int &nx1, const int &ny1, const int &nz1, const double &x1,
-    const double &y1, const double &z1, const double &alpha1, const int &nx2,
-    const int &ny2, const int &nz2, const double &x2, const double &y2,
-    const double &z2, const double &alpha2, const int &nx3, const int &ny3,
-    const int &nz3, const double &x3, const double &y3, const double &z3,
-    const double &alpha3, const int &nx4, const int &ny4, const int &nz4,
-    const double &x4, const double &y4, const double &z4,
-    const double &alpha4) {
+    int nx1, int ny1, int nz1, double x1, double y1, double z1, double alpha1,
+    int nx2, int ny2, int nz2, double x2, double y2, double z2, double alpha2,
+    int nx3, int ny3, int nz3, double x3, double y3, double z3, double alpha3,
+    int nx4, int ny4, int nz4, double x4, double y4, double z4, double alpha4) {
   const double p = alpha1 + alpha2;
   const double mup = alpha1 * alpha2 / p;
   const double xp = (alpha1 * x1 + alpha2 * x2) / p;

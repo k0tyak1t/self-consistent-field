@@ -1,5 +1,6 @@
 #pragma once
 
+#include "matrix_buffer.h"
 #include "scf.h"
 #include "standard_matrices.h"
 #include <deque>
@@ -10,26 +11,25 @@
 #endif
 
 class DIIS : public SCF {
-public:
+public: // constructor
   DIIS(MO &, StandardMatrices &);
 
-  // pre-diis
+public: // pre-diis stage
   void update_error();
 
-  // diis
-  void update_fock_buffer();
-  void update_error_buffer();
+public: // diis stage
   void update_extended_error_product();
   void update_diis_coefs();
   void update_diis_error();
   void update_diis_fock();
+  void update_diis_density();
 
   // solver
   void solve() override;
 
 private:
-  int diis_size;
-  matrix error, extended_diis_product;
-  std::deque<matrix> fock_buffer, error_buffer;
+  std::size_t diis_size;
+  Matrix error, extended_diis_product;
+  Buffer<Matrix> fock_buffer, error_buffer, density_buffer;
   std::vector<double> diis_coefs;
 };

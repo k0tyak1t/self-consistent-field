@@ -11,6 +11,7 @@
 #include "mur_dav_prim_integrals.h"
 #include "standard_matrices.h"
 #include "utils.h"
+#define ANGSTROM_TO_BOHR 1.8897259886
 
 bool InputAndMDIntegrals::readGeom(char *filename) {
   std::ifstream inp(filename);
@@ -21,16 +22,17 @@ bool InputAndMDIntegrals::readGeom(char *filename) {
   getline(inp, cur_str);
   Atom cur_atom;
   while (inp >> cur_str >> cur_atom.x >> cur_atom.y >> cur_atom.z) {
+    cur_atom.x *= ANGSTROM_TO_BOHR;
+    cur_atom.y *= ANGSTROM_TO_BOHR;
+    cur_atom.z *= ANGSTROM_TO_BOHR;
     cur_atom.q = get_nuclear_charge(cur_str);
-    if (cur_atom.q == 0) {
+    if (cur_atom.q == 0)
       throw std::runtime_error("Incorrect atom.");
-    }
     atoms.push_back(cur_atom);
   }
   inp.close();
-  if (num_atoms != int(atoms.size())) {
+  if (num_atoms != int(atoms.size()))
     throw std::runtime_error("Incorrect number of atoms.");
-  }
   return true;
 }
 
@@ -71,7 +73,7 @@ bool InputAndMDIntegrals::readBasisLib(char *filename) {
 
 bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   std_m.init(basisFunctions.size());
-  //	Вычисление энергии электрон-электронного взаимодействия и числа
+  // Вычисление энергии электрон-электронного взаимодействия и числа
   // электронов из условия электронейтральности
   double total_Vnn = 0;
   int num_el = 0;
@@ -86,7 +88,7 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   std_m.set_total_Vnn(total_Vnn);
   std_m.set_num_el(num_el);
 
-  //	расчет матричных элементов S,T,Hcore
+  // расчет матричных элементов S,T,Hcore
   int ii, jj, kk, ll;
   ii = jj = 0;
   for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i =
@@ -211,27 +213,22 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   }
   std::cout << std::endl;
   //	Матрица X
-  int nAO = basisFunctions.size();
-  std_m.X.init(nAO);
+  std::size_t nAO = basisFunctions.size();
+  std_m.X = Matrix{nAO};
   double *evec = new double[nAO * nAO];
   double *eval = new double[nAO];
   std_m.S.eigen_vv(evec, eval);
-  matrix s;
-  s.init(nAO);
-  for (int i = 0; i < nAO; i++) { // создание матрицы S^(-0.5)
-    for (int j = 0; j < nAO; j++) {
-      s[i][j] = 0;
-    }
-    s[i][i] = 1.0 / sqrt(eval[i]);
-  }
+  Matrix s{nAO};
+  for (std::size_t i = 0; i < nAO; i++) // создание матрицы S^(-0.5)
+    for (std::size_t j = 0; j < nAO; j++)
+      i != j ? s[i][j] = 0 : s[i][i] = 1.0 / sqrt(eval[i]);
+
   delete[] eval;
-  matrix U;
-  U.init(nAO);
+  Matrix U{nAO};
   U.from_array(evec);
   delete[] evec;
-  matrix vs;
-  vs.init(nAO);
-  std_m.X = U.T() * s * U;
+  Matrix vs{nAO};
+  std_m.X = Matrix::transposed(U) * s * U;
   return true;
 }
 
@@ -252,7 +249,7 @@ void InputAndMDIntegrals::printBasis() {
       std::cout << "  nZ=" << jt->second.nz << '\n';
       for (vector<pair<double, double>>::iterator kt = jt->second.ai_ci.begin();
            kt != jt->second.ai_ci.end(); kt++)
-        std::cout << "         " << (*kt).first << "  " << (*kt).second << '\n';
+        std::cout << "         " << kt->first << "  " << kt->second << '\n';
     }
   }
 }
@@ -281,7 +278,7 @@ bool InputAndMDIntegrals::set_c2v_z(int *symmAO) {
                      "установлена\n";
         isGood = false;
       }
-      int symm_ = 2 * (jt->second.ny % 2) + ((*jt).second.nx % 2) + 1;
+      int symm_ = 2 * (jt->second.ny % 2) + (jt->second.nx % 2) + 1;
       if (symm == 0)
         symm = symm_;
       if (symm != symm_)
@@ -429,7 +426,7 @@ int InputAndMDIntegrals::get_nuclear_charge(const std::string &str_) const {
 
 int InputAndMDIntegrals::get_orbital_momentum(const std::string &str_) const {
   std::string str(str_);
-  std::transform(str.begin(), str.end(), str.begin(), toupper);
+  std::transform(str.begin(), str.end(), str.begin(), ::toupper);
   if ((str == "S") || (str == "L0"))
     return 0;
   if ((str == "P") || (str == "L1"))
