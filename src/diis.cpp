@@ -178,7 +178,7 @@ void DIIS::solve() {
     } else { // before DIIS
       density = update_density();
       fock = update_fock();
-      update_error();
+      update_error(); // prev -> cur; cur = new
     }
 
     fock_buffer.update(fock);

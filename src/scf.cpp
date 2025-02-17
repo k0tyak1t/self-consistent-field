@@ -92,6 +92,10 @@ Matrix SCF::update_fock() const {
   return fock_;
 }
 
+/**
+ * @brief prev -> cur, cur -> new
+ * !!! CHANGES CLASS STATE !!!
+ */
 void SCF::update_energy() {
   prev_energy = cur_energy;
 

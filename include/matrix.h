@@ -38,7 +38,6 @@ public:
 public: // non-const operations
   Matrix &operator+=(const Matrix &);
   Matrix &operator-=(const Matrix &);
-  Matrix &operator*=(double);
   Matrix &operator/=(double);
   Matrix transpose(); // in-place transposition
 
@@ -49,7 +48,6 @@ public: // const operations
   Matrix operator*(double) const;
   Matrix operator/(double) const;
   bool operator==(const Matrix &) const;
-  double trace() const;
   void eigen_vv(double *, double *) const;
   std::vector<double> operator*(const std::vector<double> &) const;
 
@@ -58,6 +56,7 @@ public: // static functions:
   static Matrix inversed(const Matrix &);
   static double det(const Matrix &);
   static double dot(const Matrix &, const Matrix &);
+  static double trace(const Matrix &);
 
 public:
   Matrix minor(std::size_t, std::size_t) const;

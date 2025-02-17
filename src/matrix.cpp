@@ -85,10 +85,9 @@ Matrix &Matrix::operator=(Matrix &&other) {
 }
 
 Matrix &Matrix::operator+=(const Matrix &other) {
-  for (std::size_t i = 0; i < n * n; ++i) {
-    data_[i] += other.data_[i];
-  }
-
+  for (auto i = 0u; i < n; ++i)
+    for (auto j = 0u; j < n; ++j)
+      (*this)[i][j] += other[i][j];
   return *this;
 }
 
@@ -125,9 +124,10 @@ Matrix Matrix::operator*(const Matrix &other) const {
 }
 
 Matrix Matrix::operator*(double num) const {
-  Matrix result = *this;
-  for (auto &i : result)
-    i *= num;
+  Matrix result{*this};
+  for (auto i = 0u; i < result.size(); ++i)
+    for (auto j = 0u; i < result.size(); ++i)
+      result[i][j] *= num;
 
   return result;
 }
@@ -193,10 +193,10 @@ bool Matrix::operator==(const Matrix &other) const {
   return true;
 }
 
-double Matrix::trace() const {
+double Matrix::trace(const Matrix &rhs) {
   double result{};
-  for (std::size_t i = 0; i < n; ++i)
-    result += data_[i * (1 + n)];
+  for (std::size_t i = 0; i < rhs.size(); ++i)
+    result += rhs[i][i];
   return result;
 }
 
