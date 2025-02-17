@@ -59,7 +59,8 @@ Matrix::~Matrix() { delete[] data_; }
 // selectors
 const Matrix::RowProxy Matrix::operator[](std::size_t i) const {
   if (n <= i || i < 0)
-    throw std::out_of_range("Row index is out of range!");
+    throw std::out_of_range("Row index " + std::to_string(i) +
+                            " is out of range!");
 
   return RowProxy{n, data_ + i * n};
 }
@@ -67,7 +68,8 @@ const Matrix::RowProxy Matrix::operator[](std::size_t i) const {
 // modifiers
 Matrix::RowProxy Matrix::operator[](std::size_t i) {
   if (n <= i || i < 0)
-    throw std::out_of_range("Row index is out of range!");
+    throw std::out_of_range("Row index " + std::to_string(i) +
+                            " is out of range!");
 
   return RowProxy{n, data_ + i * n};
 }

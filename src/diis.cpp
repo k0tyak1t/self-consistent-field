@@ -16,6 +16,17 @@
 #include <stdexcept>
 #include <vector>
 
+namespace {
+Matrix expand(Buffer<Matrix> buffer, std::vector<double> coefs) {
+  Matrix result = Matrix::zero_like(buffer[0]);
+  auto bi = buffer.begin(), be = buffer.end();
+  auto ci = coefs.begin(), ce = coefs.end();
+  for (; bi != be; ++bi, ++ci)
+    result += (*bi) * (*ci);
+  return result;
+}
+} // namespace
+
 DIIS::DIIS(MO &mo, StandardMatrices &std_m)
     : SCF(mo, std_m), diis_size(DEFAULT_DIIS_SIZE),
       error(Matrix::zero(diis_size)),
@@ -74,11 +85,11 @@ void DIIS::update_diis_coefs() {
   std::vector<int> IPIV(N);
 
   // Initialize RHS: [0, ..., 0, 1]
-  diis_coefs = std::vector<double>(diis_size + 1);
+  diis_coefs = std::vector<double>(diis_size + 1, 0.0);
   diis_coefs[diis_size] = 1.0;
 
   Matrix copy{extended_diis_product};
-  int INFO = LAPACKE_dgesv(LAPACK_ROW_MAJOR, N, NRHS, copy.data(), N,
+  int INFO = LAPACKE_dgesv(LAPACK_COL_MAJOR, N, NRHS, copy.data(), N,
                            IPIV.data(), diis_coefs.data(), N);
 
   if (INFO != 0)
@@ -86,15 +97,6 @@ void DIIS::update_diis_coefs() {
                              "INFO = " +
                              std::to_string(INFO) +
                              ", matrix size = " + std::to_string(N));
-
-#ifndef NNORMALIZE // normalization
-  double sum{};
-  for (std::size_t i = 0; i < diis_size; ++i)
-    sum += diis_coefs[i];
-
-  for (std::size_t i = 0; i < diis_size; ++i)
-    diis_coefs[i] /= sum;
-#endif
 
 #ifndef NDEBUG
   std::cout << "DIIS coefs: ";
@@ -159,9 +161,15 @@ void DIIS::solve() {
     if (iter > diis_size) {
       update_extended_error_product();
       update_diis_coefs();
+#if 1
+      fock = expand(fock_buffer, diis_coefs);
+      error = expand(error_buffer, diis_coefs);
+      density = expand(density_buffer, diis_coefs);
+#else
       update_diis_fock();
       update_diis_error();
       update_diis_density();
+#endif
     }
 
     else {
