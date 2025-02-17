@@ -267,11 +267,11 @@ void Matrix::eigen_vv(double *evec, double *eval) const {
   delete[] work;
 }
 
-Matrix Matrix::inverse() const {
-  Matrix inv{*this};
-  int N = n;
-  int *IPIV = new int[n];
-  int LWORK = n * n;
+Matrix Matrix::inversed(const Matrix &other) {
+  Matrix inv{other};
+  int N = other.size();
+  int *IPIV = new int[N];
+  int LWORK = N * N;
   double *WORK = new double[LWORK];
   int INFO;
   dgetrf_(&N, &N, inv.data(), &N, IPIV, &INFO);

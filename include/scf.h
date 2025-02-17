@@ -25,7 +25,7 @@ public:
   void print_iter(int) const;
 
   // helpers
-  void core_guess();
+  Matrix core_guess();
   void update_lcao_coefs();
   void update_density();
   void update_fock();

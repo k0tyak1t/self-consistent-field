@@ -50,7 +50,6 @@ public: // const operations
   Matrix operator/(double) const;
   bool operator==(const Matrix &) const;
   double trace() const;
-  Matrix inverse() const;
   void eigen_vv(double *, double *) const;
   std::vector<double> operator*(const std::vector<double> &) const;
 

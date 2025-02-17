@@ -47,7 +47,7 @@ void DIIS::update_error() {
 #if 1
   error = fock * density * std_m.S - std_m.S * density * fock;
 #else
-  Matrix cinv = lcao_coefs.inverse();
+  Matrix cinv = Matrix::inversed(lcao_coefs);
   Matrix fock_mo = cinv * fock * Matrix::transposed(cinv);
   std::size_t n_occ = std_m.get_num_el() / 2;
   std::size_t n_virt = std_m.get_nAO() - n_occ;
@@ -98,6 +98,15 @@ void DIIS::update_diis_coefs() {
                              std::to_string(INFO) +
                              ", matrix size = " + std::to_string(N));
 
+#ifdef NORMALIZE // normalization
+  double sum{};
+  for (std::size_t i = 0; i < diis_size; ++i)
+    sum += diis_coefs[i];
+
+  for (std::size_t i = 0; i < diis_size; ++i)
+    diis_coefs[i] /= sum;
+#endif
+
 #ifndef NDEBUG
   std::cout << "DIIS coefs: ";
   for (double c : diis_coefs)
@@ -139,7 +148,8 @@ void DIIS::update_diis_density() {
 }
 
 void DIIS::solve() {
-  core_guess();
+  fock = core_guess();
+
 #ifndef NDEBUG
   std::ofstream log_stream;
   log_stream.open("logs/hcore.log", std::ios::app);
@@ -156,23 +166,17 @@ void DIIS::solve() {
     }
 
     update_lcao_coefs();
-    update_density();
 
     if (iter > diis_size) {
       update_extended_error_product();
       update_diis_coefs();
-#if 1
+      density = expand(density_buffer, diis_coefs);
       fock = expand(fock_buffer, diis_coefs);
       error = expand(error_buffer, diis_coefs);
-      density = expand(density_buffer, diis_coefs);
-#else
-      update_diis_fock();
-      update_diis_error();
-      update_diis_density();
-#endif
     }
 
     else {
+      update_density();
       update_fock();
       update_error();
     }

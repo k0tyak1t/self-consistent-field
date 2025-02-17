@@ -15,7 +15,7 @@ double SCF::get_total_energy() { return cur_energy + std_m.get_total_Vnn(); }
 
 // A' = XAX^{\dagger}
 Matrix SCF::transform_matrix(const Matrix &mat) const {
-  return std_m.X * mat * std_m.X;
+  return std_m.X * mat * Matrix::transposed(std_m.X);
 }
 
 void SCF::print_iter(int iter) const {
@@ -25,7 +25,7 @@ void SCF::print_iter(int iter) const {
 }
 
 // F = H^{core}
-void SCF::core_guess() { fock = std_m.H; }
+Matrix SCF::core_guess() { return std_m.H; }
 
 // F'C' = C'E => C' => C
 void SCF::update_lcao_coefs() {
@@ -55,9 +55,9 @@ void SCF::update_density() {
   std::cout << "[SCF]: density matrix update...\n";
 #endif
   density = Matrix::zero_like(density);
-  for (std::size_t m = 0; m < nAO; ++m)
-    for (std::size_t n = 0; n < nAO; ++n)
-      for (std::size_t a = 0; a < std_m.get_num_el() / 2; ++a)
+  for (auto m = 0u; m < nAO; ++m)
+    for (auto n = 0u; n < nAO; ++n)
+      for (auto a = 0u; a < std_m.get_num_el() / 2; ++a)
         density[m][n] += 2 * lcao_coefs[m][a] * lcao_coefs[n][a];
 #ifndef NDEBUG
   std::cout << "[SCF]: density matrix updated.\n";
@@ -72,11 +72,11 @@ void SCF::update_fock() {
 #ifndef NDEBUG
   std::cout << "[SCF]: fock matrix update...\n";
 #endif
-  for (std::size_t m = 0; m < nAO; ++m)
-    for (std::size_t n = 0; n < nAO; ++n) {
+  for (auto m = 0u; m < nAO; ++m)
+    for (auto n = 0u; n < nAO; ++n) {
       fock[m][n] = std_m.H[m][n];
-      for (std::size_t l = 0; l < nAO; ++l)
-        for (std::size_t s = 0; s < nAO; ++s)
+      for (auto l = 0u; l < nAO; ++l)
+        for (auto s = 0u; s < nAO; ++s)
           fock[m][n] += density[l][s] * (std_m.get_eri(m, n, s, l) -
                                          0.5 * std_m.get_eri(m, l, s, n));
     }
@@ -101,7 +101,7 @@ void SCF::update_energy() {
 }
 
 void SCF::solve() {
-  core_guess();
+  fock = core_guess();
 
 #ifndef NDEBUG
   std::ofstream log_stream;

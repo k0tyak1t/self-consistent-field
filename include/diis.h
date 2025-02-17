@@ -20,9 +20,9 @@ public: // pre-diis stage
 public: // diis stage
   void update_extended_error_product();
   void update_diis_coefs();
-  void update_diis_error();
-  void update_diis_fock();
-  void update_diis_density();
+  void update_diis_error();   // TODO: deprecated! To be deleted
+  void update_diis_fock();    // TODO: deprecated! To be deleted
+  void update_diis_density(); // TODO: deprecated! To be deleted
 
   // solver
   void solve() override;
