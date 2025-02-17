@@ -17,21 +17,21 @@ class SCF {
 public:
   SCF(MO &, StandardMatrices &);
 
-  // getters
+public: // selectors
   double get_total_energy();
 
-  // utilities
+public: // utils
   Matrix transform_matrix(const Matrix &) const;
   void print_iter(int) const;
 
-  // helpers
+public: // solver subfunctions
   Matrix core_guess();
   void update_lcao_coefs();
-  void update_density();
-  void update_fock();
+  Matrix update_density() const;
+  Matrix update_fock() const;
   void update_energy();
 
-  // solver
+public: // solver
   virtual void solve();
 
 protected:

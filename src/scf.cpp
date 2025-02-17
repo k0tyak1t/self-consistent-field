@@ -50,36 +50,37 @@ void SCF::update_lcao_coefs() {
 // D = CC^{\dagger}
 // D_{\mu\nu} = 2 \sum_{a = 1}^{n_{el}/2}{C_{\mu a}C_{\nu a}}
 // src: "Modern Quantum Chemistry", p.139, f-No. 3.145
-void SCF::update_density() {
+Matrix SCF::update_density() const {
 #ifndef NDEBUG
   std::cout << "[SCF]: density matrix update...\n";
 #endif
-  density = Matrix::zero_like(density);
+  auto density_ = Matrix::zero_like(density);
   for (auto m = 0u; m < nAO; ++m)
     for (auto n = 0u; n < nAO; ++n)
       for (auto a = 0u; a < std_m.get_num_el() / 2; ++a)
-        density[m][n] += 2 * lcao_coefs[m][a] * lcao_coefs[n][a];
+        density_[m][n] += 2 * lcao_coefs[m][a] * lcao_coefs[n][a];
 #ifndef NDEBUG
   std::cout << "[SCF]: density matrix updated.\n";
 #endif
+  return density_;
 }
 
 // F_{\mu\nu} = H^{core}_{\mu\nu} +
 // \sum_{\lambda\sigma}{D_{\lambda\sigma} * \left[(\mu\nu|\sigma\lambda) -
 // \frac{1}{2}(\mu\lambda|\sigma\nu)\right]}
 // src: "Modern Quantum Chemistry", p. 141, f-No. 3.154
-void SCF::update_fock() {
+Matrix SCF::update_fock() const {
 #ifndef NDEBUG
   std::cout << "[SCF]: fock matrix update...\n";
 #endif
+  Matrix fock_ = std_m.H;
   for (auto m = 0u; m < nAO; ++m)
-    for (auto n = 0u; n < nAO; ++n) {
-      fock[m][n] = std_m.H[m][n];
+    for (auto n = 0u; n < nAO; ++n)
       for (auto l = 0u; l < nAO; ++l)
         for (auto s = 0u; s < nAO; ++s)
-          fock[m][n] += density[l][s] * (std_m.get_eri(m, n, s, l) -
-                                         0.5 * std_m.get_eri(m, l, s, n));
-    }
+          fock_[m][n] += density[l][s] * (std_m.get_eri(m, n, s, l) -
+                                          0.5 * std_m.get_eri(m, l, s, n));
+
 #ifndef NDEBUG
   std::ofstream log_stream;
   log_stream.open("logs/fock.log", std::ios::app);
@@ -87,6 +88,8 @@ void SCF::update_fock() {
   log_stream.close();
   std::cout << "[SCF]: fock matrix updated.\n";
 #endif
+
+  return fock_;
 }
 
 void SCF::update_energy() {
@@ -112,8 +115,8 @@ void SCF::solve() {
 
   for (int iter = 1; iter <= max_iter; ++iter) {
     update_lcao_coefs();
-    update_density();
-    update_fock();
+    density = update_density();
+    fock = update_fock();
     update_energy();
     print_iter(iter);
 

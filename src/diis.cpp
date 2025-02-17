@@ -35,6 +35,7 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
       error_buffer(diis_size, Matrix::zero(diis_size)),
       density_buffer(diis_size, Matrix::zero(diis_size)),
       diis_coefs(diis_size + 1) {
+
   error = Matrix::zero(diis_size);
 
   for (std::size_t i = 0; i < diis_size; ++i) {
@@ -65,8 +66,8 @@ void DIIS::update_error() {
 }
 
 void DIIS::update_extended_error_product() {
-  for (std::size_t i = 0; i < diis_size; ++i)
-    for (std::size_t j = 0; j < diis_size; ++j)
+  for (auto i = 0u; i < diis_size; ++i)
+    for (auto j = 0u; j < diis_size; ++j)
       extended_diis_product[i][j] =
           Matrix::dot(error_buffer[i], error_buffer[j]);
 
@@ -84,12 +85,13 @@ void DIIS::update_diis_coefs() {
   int NRHS = 1;
   std::vector<int> IPIV(N);
 
-  // Initialize RHS: [0, ..., 0, 1]
+  // B matrix is extended with [1 ... 1 0] in constructor
+  // Initialize RHS: [0 ... 0 1]
   diis_coefs = std::vector<double>(diis_size + 1, 0.0);
   diis_coefs[diis_size] = 1.0;
 
-  Matrix copy{extended_diis_product};
-  int INFO = LAPACKE_dgesv(LAPACK_COL_MAJOR, N, NRHS, copy.data(), N,
+  Matrix b_copy{extended_diis_product};
+  int INFO = LAPACKE_dgesv(LAPACK_COL_MAJOR, N, NRHS, b_copy.data(), N,
                            IPIV.data(), diis_coefs.data(), N);
 
   if (INFO != 0)
@@ -165,19 +167,17 @@ void DIIS::solve() {
       return;
     }
 
-    update_lcao_coefs();
+    update_lcao_coefs(); // C first because D = f(C)
 
-    if (iter > diis_size) {
+    if (iter > diis_size) { // DIIS
       update_extended_error_product();
       update_diis_coefs();
       density = expand(density_buffer, diis_coefs);
       fock = expand(fock_buffer, diis_coefs);
       error = expand(error_buffer, diis_coefs);
-    }
-
-    else {
-      update_density();
-      update_fock();
+    } else { // before DIIS
+      density = update_density();
+      fock = update_fock();
       update_error();
     }
 
