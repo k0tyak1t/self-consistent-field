@@ -31,7 +31,7 @@ bool InputAndMDIntegrals::readGeom(char *filename) {
     atoms.push_back(cur_atom);
   }
   inp.close();
-  if (num_atoms != int(atoms.size()))
+  if (num_atoms != atoms.size())
     throw std::runtime_error("Incorrect number of atoms.");
   return true;
 }
@@ -131,10 +131,10 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
           Vij += Vij_t * i1->first * j1->first;
         }
 
-      std_m.S[ii][jj] = Sij;
-      std_m.T[ii][jj] = Tij;
-      std_m.Ven[ii][jj] = -Vij;
-      std_m.H[ii][jj] = Tij - Vij;
+      std_m.S(ii, jj) = Sij;
+      std_m.T(ii, jj) = Tij;
+      std_m.Ven(ii, jj) = -Vij;
+      std_m.H(ii, jj) = Tij - Vij;
       jj++;
     }
     ii++;
@@ -143,7 +143,7 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   ii = jj = kk = ll = 0;
   const int ii_end = int(basisFunctions.size());
 
-  unsigned char progress;
+  unsigned char progress{};
 
   for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i =
            basisFunctions.begin();
@@ -212,31 +212,27 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
     display_progress(progress, "ERI calculation: ");
   }
   std::cout << std::endl;
-  //	Матрица X
+
   std::size_t nAO = basisFunctions.size();
   std_m.X = Matrix{nAO};
-  double *evec = new double[nAO * nAO];
-  double *eval = new double[nAO];
-  std_m.S.eigen_vv(evec, eval);
-  Matrix s{nAO};
-  for (std::size_t i = 0; i < nAO; i++) // создание матрицы S^(-0.5)
-    for (std::size_t j = 0; j < nAO; j++)
-      i != j ? s[i][j] = 0 : s[i][i] = 1.0 / sqrt(eval[i]);
 
-  delete[] eval;
+  std::vector<double> evec(nAO * nAO);
+  std::vector<double> eval(nAO);
+  std_m.S.eigen_vv(evec.data(), eval.data());
+
+  Matrix s{nAO};
+  for (auto i = 0u; i < nAO; ++i)
+    s(i, i) = 1.0 / sqrt(eval[i]);
+
   Matrix U{nAO};
-  U.from_array(evec);
-  delete[] evec;
-  Matrix vs{nAO};
+  U.from_array(evec.data());
   std_m.X = Matrix::transposed(U) * s * U;
   return true;
 }
 
 void InputAndMDIntegrals::printBasis() {
   int nBFs = 0;
-  for (vector<vector<pair<int, SingleBasisFunction>>>::iterator it =
-           basisFunctions.begin();
-       it != basisFunctions.end(); it++) {
+  for (auto it = basisFunctions.begin(); it != basisFunctions.end(); it++) {
     std::cout << "Basis function #" << ++nBFs << ":\n";
     for (vector<pair<int, SingleBasisFunction>>::iterator jt = it->begin();
          jt != it->end(); jt++) {

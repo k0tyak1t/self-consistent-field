@@ -22,11 +22,17 @@ public: // static factory methods
   static Matrix identity_like(const Matrix &);
 
 public: // selectors
+  const double operator()(const unsigned i, const unsigned j) const {
+    return data_[i * n + j];
+  }
   const RowProxy operator[](std::size_t) const;
   const double *begin() const { return data_; }
   const double *end() const { return data_ + n * n; }
 
 public: // modifiers
+  double &operator()(const unsigned i, const unsigned j) {
+    return data_[i * n + j];
+  }
   RowProxy operator[](std::size_t);
   double *begin() { return data_; }
   double *end() { return data_ + n * n; }
