@@ -16,9 +16,9 @@
 #include <stdexcept>
 #include <vector>
 
-namespace {
+namespace { // temporary implementation
 Matrix expand(Buffer<Matrix> buffer, std::vector<double> coefs) {
-  Matrix result = Matrix::zero_like(buffer[0]);
+  auto result = Matrix::zero_like(buffer[0]);
   auto bi = buffer.begin(), be = buffer.end();
   auto ci = coefs.begin(), ce = coefs.end();
   for (; bi != be; ++bi, ++ci)
@@ -39,8 +39,8 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
   error = Matrix::zero(diis_size);
 
   for (std::size_t i = 0; i < diis_size; ++i) {
-    extended_diis_product[diis_size][i] = 1.0;
-    extended_diis_product[i][diis_size] = 1.0;
+    extended_diis_product(diis_size, i) = 1.0;
+    extended_diis_product(i, diis_size) = 1.0;
   }
 }
 
@@ -68,7 +68,7 @@ void DIIS::update_error() {
 void DIIS::update_extended_error_product() {
   for (auto i = 0u; i < diis_size; ++i)
     for (auto j = 0u; j < diis_size; ++j)
-      extended_diis_product[i][j] =
+      extended_diis_product(i, j) =
           Matrix::dot(error_buffer[i], error_buffer[j]);
 
 #ifndef NDEBUG
