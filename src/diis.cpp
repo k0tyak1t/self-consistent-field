@@ -45,24 +45,7 @@ DIIS::DIIS(MO &mo, StandardMatrices &std_m)
 }
 
 void DIIS::update_error() {
-#if 1
   error = fock * density * std_m.S - std_m.S * density * fock;
-#else
-  Matrix cinv = Matrix::inversed(lcao_coefs);
-  Matrix fock_mo = cinv * fock * Matrix::transposed(cinv);
-  std::size_t n_occ = std_m.get_num_el() / 2;
-  std::size_t n_virt = std_m.get_nAO() - n_occ;
-
-  error = Matrix{n_occ > n_virt ? n_occ : n_virt};
-
-  for (auto i = 0u; i < n_occ; ++i)
-    for (auto j = 0u; j < n_virt; ++j)
-      error[i][j] = fock_mo[i][j + n_occ];
-
-#ifndef NDEBUG
-  std::cout << "num occ.: " << n_occ << " num virt.: " << n_virt << std::endl;
-#endif // NDEBUG
-#endif // ~0
 }
 
 void DIIS::update_extended_error_product() {

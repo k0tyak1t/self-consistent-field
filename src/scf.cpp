@@ -58,7 +58,7 @@ Matrix SCF::update_density() const {
   for (auto m = 0u; m < nAO; ++m)
     for (auto n = 0u; n < nAO; ++n)
       for (auto a = 0u; a < std_m.get_num_el() / 2; ++a)
-        density_[m][n] += 2 * lcao_coefs[m][a] * lcao_coefs[n][a];
+        density_(m, n) += 2 * lcao_coefs(m, a) * lcao_coefs(n, a);
 #ifndef NDEBUG
   std::cout << "[SCF]: density matrix updated.\n";
 #endif
@@ -78,7 +78,7 @@ Matrix SCF::update_fock() const {
     for (auto n = 0u; n < nAO; ++n)
       for (auto l = 0u; l < nAO; ++l)
         for (auto s = 0u; s < nAO; ++s)
-          fock_[m][n] += density[l][s] * (std_m.get_eri(m, n, s, l) -
+          fock_(m, n) += density(l, s) * (std_m.get_eri(m, n, s, l) -
                                           0.5 * std_m.get_eri(m, l, s, n));
 
 #ifndef NDEBUG
@@ -102,7 +102,7 @@ void SCF::update_energy() {
   cur_energy = 0;
   for (std::size_t m = 0; m < nAO; ++m) {
     for (std::size_t n = 0; n < nAO; ++n) {
-      cur_energy += density[n][m] * (std_m.H[m][n] + fock[m][n]) / 2;
+      cur_energy += density(n, m) * (std_m.H(m, n) + fock(m, n)) / 2;
     }
   }
 }

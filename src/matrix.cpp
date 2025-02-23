@@ -17,27 +17,6 @@ void dgetri_(int *N, double *A, int *lda, int *IPIV, double *WORK, int *lwork,
              int *INFO);
 }
 
-const double &Matrix::RowProxy::operator[](std::size_t i) const {
-  if (i >= n || i < 0)
-    throw std::out_of_range("Column index is out of range! " +
-                            std::to_string(i) + " > " + std::to_string(n) +
-                            '\n');
-
-  return data_[i];
-}
-
-double &Matrix::RowProxy::operator[](std::size_t i) {
-  if (i >= n || i < 0)
-    throw std::out_of_range("Column index is out of range! " +
-                            std::to_string(i) + " > " + std::to_string(n) +
-                            '\n');
-
-  return data_[i];
-}
-
-// * * * * ------------ * * * * //
-// * * * * constructors * * * * //
-// * * * * ------------ * * * * //
 Matrix::Matrix() : n(0), data_(nullptr) {}
 
 Matrix::Matrix(const std::size_t n_new)
@@ -56,24 +35,6 @@ Matrix::Matrix(Matrix &&other) {
 
 Matrix::~Matrix() { delete[] data_; }
 
-// selectors
-const Matrix::RowProxy Matrix::operator[](std::size_t i) const {
-  if (n <= i || i < 0)
-    throw std::out_of_range("Row index " + std::to_string(i) +
-                            " is out of range!");
-
-  return RowProxy{n, data_ + i * n};
-}
-
-// modifiers
-Matrix::RowProxy Matrix::operator[](std::size_t i) {
-  if (n <= i || i < 0)
-    throw std::out_of_range("Row index " + std::to_string(i) +
-                            " is out of range!");
-
-  return RowProxy{n, data_ + i * n};
-}
-
 Matrix &Matrix::operator=(Matrix &&other) {
 
   if (this == &other)
@@ -87,7 +48,7 @@ Matrix &Matrix::operator=(Matrix &&other) {
 Matrix &Matrix::operator+=(const Matrix &other) {
   for (auto i = 0u; i < n; ++i)
     for (auto j = 0u; j < n; ++j)
-      (*this)[i][j] += other[i][j];
+      (*this)(i, j) += other(i, j);
   return *this;
 }
 
@@ -115,9 +76,9 @@ Matrix Matrix::operator*(const Matrix &other) const {
 
   for (std::size_t i = 0; i < n; ++i)
     for (std::size_t j = 0; j < n; ++j) {
-      result[i][j] = 0;
+      result(i, j) = 0;
       for (std::size_t k = 0; k < n; ++k)
-        result[i][j] += (*this)[i][k] * other[k][j];
+        result(i, j) += (*this)(i, k) * other(k, j);
     }
 
   return result;
@@ -127,7 +88,7 @@ Matrix Matrix::operator*(double num) const {
   Matrix result{*this};
   for (auto i = 0u; i < result.size(); ++i)
     for (auto j = 0u; i < result.size(); ++i)
-      result[i][j] *= num;
+      result(i, j) *= num;
 
   return result;
 }
@@ -135,7 +96,7 @@ Matrix Matrix::operator*(double num) const {
 Matrix Matrix::transpose() {
   for (auto i = 0u; i < n; ++i)
     for (auto j = i; j < n; ++j)
-      std::swap((*this)[i][j], (*this)[j][i]);
+      std::swap((*this)(i, j), (*this)(j, i));
 
   return *this;
 }
@@ -144,7 +105,7 @@ Matrix Matrix::operator/(const double num) const {
   Matrix result(n);
   for (std::size_t i = 0; i < n; ++i) {
     for (std::size_t j = 0; j < n; ++j) {
-      result[i][j] /= num;
+      result(i, j) /= num;
     }
   }
   return result;
@@ -164,7 +125,7 @@ Matrix &Matrix::operator=(const Matrix &other) {
 std::ostream &operator<<(std::ostream &os, const Matrix &mat) {
   for (std::size_t i = 0; i < mat.size(); ++i) {
     for (std::size_t j = 0; j < mat.size(); ++j) {
-      os << std::setprecision(4) << std::setw(8) << mat[i][j] << " ";
+      os << std::setprecision(4) << std::setw(8) << mat(i, j) << " ";
     }
     os << '\n';
   }
@@ -178,7 +139,7 @@ std::vector<double> Matrix::operator*(const std::vector<double> &vec) const {
   for (std::size_t i = 0; i < n; ++i) {
     ri = 0;
     for (std::size_t j = 0; j < n; ++j) {
-      ri += (*this)[i][j] * vec[j];
+      ri += (*this)(i, j) * vec[j];
     }
     result.push_back(ri);
   }
@@ -196,7 +157,7 @@ bool Matrix::operator==(const Matrix &other) const {
 double Matrix::trace(const Matrix &rhs) {
   double result{};
   for (std::size_t i = 0; i < rhs.size(); ++i)
-    result += rhs[i][i];
+    result += rhs(i, i);
   return result;
 }
 
@@ -218,28 +179,9 @@ Matrix Matrix::minor(std::size_t i, std::size_t j) const {
   for (std::size_t k = 0; k < n; ++k)
     for (std::size_t l = 0; l < n; ++l)
       if (k != i && l != j) {
-        result.data_[linear_idx] = (*this)[k][l];
+        result.data_[linear_idx] = (*this)(k, l);
         ++linear_idx;
       }
-
-  return result;
-}
-
-double Matrix::det(const Matrix &mat) { // good luck with O(n!) complexity :)
-  if (mat.n == 0)
-    return 0;
-
-  if (mat.n == 1)
-    return mat[0][0];
-
-  if (mat.n == 2)
-    return mat[0][0] * mat[1][1] - mat[1][0] * mat[0][1];
-
-  double result = 0.0;
-
-  for (std::size_t i = 0; i < mat.n; ++i)
-    if (mat[0][i])
-      result += mat[0][i] * (i % 2 == 0 ? 1 : -1) * det(mat.minor(0, i));
 
   return result;
 }
@@ -283,11 +225,6 @@ Matrix Matrix::inversed(const Matrix &other) {
 
 // methods to be dead...
 
-void Matrix::zeroize() {
-  for (std::size_t i = 0; i < n * n; ++i)
-    data_[i] = 0;
-}
-
 int Matrix::init(const int n_new) {
   if (n > 0)
     throw std::runtime_error("Matrix already initialized.\n");
@@ -309,7 +246,7 @@ Matrix Matrix::zero(const std::size_t n) { return Matrix{n}; }
 Matrix Matrix::identity(const std::size_t n) {
   Matrix identity{n};
   for (auto i = 0u; i < n; ++i)
-    identity[i][i] = 1.0;
+    identity(i, i) = 1.0;
   return identity;
 }
 
