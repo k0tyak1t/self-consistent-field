@@ -1,9 +1,5 @@
-#include <cmath>
-#include <vector>
-
 #include "single_basis_function.h"
-
-using std::vector;
+#include <cmath>
 
 void SingleBasisFunction::setLC(const int &nx_, const int &ny_, const int &nz_,
                                 const double &x_, const double &y_,
@@ -17,8 +13,7 @@ void SingleBasisFunction::setLC(const int &nx_, const int &ny_, const int &nz_,
 }
 
 void SingleBasisFunction::renorm_ci() {
-  for (vector<pair<double, double>>::iterator i = ai_ci.begin();
-       i != ai_ci.end(); i++) {
+  for (auto i = ai_ci.begin(); i != ai_ci.end(); i++) {
     double a = i->first;
     double p = 1;
     double q = 1;

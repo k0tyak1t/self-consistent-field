@@ -91,25 +91,17 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
   // расчет матричных элементов S,T,Hcore
   int ii, jj, kk, ll;
   ii = jj = 0;
-  for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i =
-           basisFunctions.begin();
-       i != basisFunctions.end(); i++) {
+  for (auto i = basisFunctions.begin(); i != basisFunctions.end(); i++) {
     jj = 0;
-    for (vector<vector<pair<int, SingleBasisFunction>>>::iterator j =
-             basisFunctions.begin();
-         j != basisFunctions.end(); j++) {
+    for (auto j = basisFunctions.begin(); j != basisFunctions.end(); j++) {
       double Sij = 0, Tij = 0, Vij = 0;
-      for (vector<pair<int, SingleBasisFunction>>::iterator i1 = i->begin();
-           i1 != i->end(); i1++)
-        for (vector<pair<int, SingleBasisFunction>>::iterator j1 = j->begin();
-             j1 != j->end(); j1++) {
+      for (auto i1 = i->begin(); i1 != i->end(); i1++)
+        for (auto j1 = j->begin(); j1 != j->end(); j1++) {
           double Sij_t = 0, Tij_t = 0, Vij_t = 0;
           SingleBasisFunction f1 = i1->second;
           SingleBasisFunction f2 = j1->second;
-          for (vector<pair<double, double>>::iterator i2 = f1.ai_ci.begin();
-               i2 != f1.ai_ci.end(); i2++)
-            for (vector<pair<double, double>>::iterator j2 = f2.ai_ci.begin();
-                 j2 != f2.ai_ci.end(); j2++) {
+          for (auto i2 = f1.ai_ci.begin(); i2 != f1.ai_ci.end(); i2++)
+            for (auto j2 = f2.ai_ci.begin(); j2 != f2.ai_ci.end(); j2++) {
               double C = i2->second * j2->second;
               Sij_t += MurDavPrimIntegrals().Sij(
                            f1.nx, f1.ny, f1.nz, f1.x, f1.y, f1.z, i2->first,
@@ -145,50 +137,29 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
 
   unsigned char progress{};
 
-  for (vector<vector<pair<int, SingleBasisFunction>>>::iterator i =
-           basisFunctions.begin();
-       i != basisFunctions.end(); i++) {
+  for (auto i = basisFunctions.begin(); i != basisFunctions.end(); i++) {
     jj = kk = ll = 0;
-    for (vector<vector<pair<int, SingleBasisFunction>>>::iterator j =
-             basisFunctions.begin();
-         j != basisFunctions.end(); j++) {
+    for (auto j = basisFunctions.begin(); j != basisFunctions.end(); j++) {
       kk = ll = 0;
-      for (vector<vector<pair<int, SingleBasisFunction>>>::iterator k =
-               basisFunctions.begin();
-           k != basisFunctions.end(); k++) {
+      for (auto k = basisFunctions.begin(); k != basisFunctions.end(); k++) {
         ll = 0;
-        for (vector<vector<pair<int, SingleBasisFunction>>>::iterator l =
-                 basisFunctions.begin();
-             l != basisFunctions.end(); l++) {
+        for (auto l = basisFunctions.begin(); l != basisFunctions.end(); l++) {
           double Vijkl = 0;
-          for (vector<pair<int, SingleBasisFunction>>::iterator i1 = i->begin();
-               i1 != i->end(); i1++)
-            for (vector<pair<int, SingleBasisFunction>>::iterator j1 =
-                     j->begin();
-                 j1 != j->end(); j1++)
-              for (vector<pair<int, SingleBasisFunction>>::iterator k1 =
-                       k->begin();
-                   k1 != k->end(); k1++)
-                for (vector<pair<int, SingleBasisFunction>>::iterator l1 =
-                         (*l).begin();
-                     l1 != (*l).end(); l1++) {
+          for (auto i1 = i->begin(); i1 != i->end(); i1++)
+            for (auto j1 = j->begin(); j1 != j->end(); j1++)
+              for (auto k1 = k->begin(); k1 != k->end(); k1++)
+                for (auto l1 = (*l).begin(); l1 != (*l).end(); l1++) {
                   double Vijkl_t = 0;
                   SingleBasisFunction f1 = i1->second;
                   SingleBasisFunction f2 = j1->second;
                   SingleBasisFunction f3 = k1->second;
                   SingleBasisFunction f4 = l1->second;
-                  for (vector<pair<double, double>>::iterator i2 =
-                           f1.ai_ci.begin();
-                       i2 != f1.ai_ci.end(); i2++)
-                    for (vector<pair<double, double>>::iterator j2 =
-                             f2.ai_ci.begin();
-                         j2 != f2.ai_ci.end(); j2++)
-                      for (vector<pair<double, double>>::iterator k2 =
-                               f3.ai_ci.begin();
-                           k2 != f3.ai_ci.end(); k2++)
-                        for (vector<pair<double, double>>::iterator l2 =
-                                 f4.ai_ci.begin();
-                             l2 != f4.ai_ci.end(); l2++)
+                  for (auto i2 = f1.ai_ci.begin(); i2 != f1.ai_ci.end(); i2++)
+                    for (auto j2 = f2.ai_ci.begin(); j2 != f2.ai_ci.end(); j2++)
+                      for (auto k2 = f3.ai_ci.begin(); k2 != f3.ai_ci.end();
+                           k2++)
+                        for (auto l2 = f4.ai_ci.begin(); l2 != f4.ai_ci.end();
+                             l2++)
                           Vijkl_t +=
                               MurDavPrimIntegrals().Vijkl(
                                   f1.nx, f1.ny, f1.nz, f1.x, f1.y, f1.z,
@@ -234,8 +205,7 @@ void InputAndMDIntegrals::printBasis() {
   int nBFs = 0;
   for (auto it = basisFunctions.begin(); it != basisFunctions.end(); it++) {
     std::cout << "Basis function #" << ++nBFs << ":\n";
-    for (vector<pair<int, SingleBasisFunction>>::iterator jt = it->begin();
-         jt != it->end(); jt++) {
+    for (auto jt = it->begin(); jt != it->end(); jt++) {
       std::cout << "  " << jt->first;
       std::cout << "  X=" << jt->second.x;
       std::cout << "  Y=" << jt->second.y;
@@ -243,8 +213,8 @@ void InputAndMDIntegrals::printBasis() {
       std::cout << "  nX=" << jt->second.nx;
       std::cout << "  nY=" << jt->second.ny;
       std::cout << "  nZ=" << jt->second.nz << '\n';
-      for (vector<pair<double, double>>::iterator kt = jt->second.ai_ci.begin();
-           kt != jt->second.ai_ci.end(); kt++)
+      for (auto kt = jt->second.ai_ci.begin(); kt != jt->second.ai_ci.end();
+           kt++)
         std::cout << "         " << kt->first << "  " << kt->second << '\n';
     }
   }
@@ -255,13 +225,10 @@ bool InputAndMDIntegrals::set_c2v_z(int *symmAO) {
   std::cout << "Проверка и установка C2v симметрии для линейных молекул, "
                "ориентированных на оси Z\n";
   bool isGood = true;
-  for (vector<vector<pair<int, SingleBasisFunction>>>::iterator it =
-           basisFunctions.begin();
-       it != basisFunctions.end(); it++) {
+  for (auto it = basisFunctions.begin(); it != basisFunctions.end(); it++) {
     std::cout << "Basis function #" << ++nBFs << ":\n";
     int symm = 0;
-    for (vector<pair<int, SingleBasisFunction>>::iterator jt = it->begin();
-         jt != it->end(); jt++) {
+    for (auto jt = it->begin(); jt != it->end(); jt++) {
       std::cout << "  " << jt->first;
       std::cout << "  X=" << jt->second.x;
       std::cout << "  Y=" << jt->second.y;
