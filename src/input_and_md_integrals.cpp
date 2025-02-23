@@ -316,22 +316,17 @@ bool InputAndMDIntegrals::makeBasis() {
   vector<pair<double, double>> kk2;
   kk1 = kk2;
   std::cout << "\n";
-  for (vector<Atom>::iterator atom = atoms.begin(); atom != atoms.end();
-       ++atom) {
+  for (auto atom = atoms.begin(); atom != atoms.end(); ++atom) {
     display_progress(progress, leading_str);
     i++;
     progress = 100 * (i + 1) / atoms.size();
 
-    map<int, vector<pair<int, vector<pair<double, double>>>>>::iterator basis =
-        basisLib.find(atom->q);
-    if (basis == basisLib.end()) {
+    auto basis = basisLib.find(atom->q);
+    if (basis == basisLib.end())
       throw std::runtime_error("Failed to load atom with charge: " +
                                std::to_string(atom->q));
-    }
 
-    for (vector<pair<int, vector<pair<double, double>>>>::iterator it1 =
-             basis->second.begin();
-         it1 != basis->second.end(); ++it1) {
+    for (auto it1 = basis->second.begin(); it1 != basis->second.end(); ++it1) {
       int l = it1->first;
       SingleBasisFunction sbf_;
       vector<pair<int, SingleBasisFunction>> mbf_;
@@ -383,11 +378,8 @@ bool InputAndMDIntegrals::makeBasis() {
     }
   }
 
-  for (vector<vector<pair<int, SingleBasisFunction>>>::iterator it =
-           basisFunctions.begin();
-       it != basisFunctions.end(); it++)
-    for (vector<pair<int, SingleBasisFunction>>::iterator jt = it->begin();
-         jt != it->end(); jt++)
+  for (auto it = basisFunctions.begin(); it != basisFunctions.end(); it++)
+    for (auto jt = it->begin(); jt != it->end(); jt++)
       jt->second.renorm_ci();
   return true;
 }
