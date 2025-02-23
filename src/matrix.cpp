@@ -7,7 +7,6 @@
 #include <iostream>
 #include <ostream>
 #include <stdexcept>
-#include <vector>
 
 extern "C" {
 // LU decomoposition of a general matrix
@@ -102,12 +101,11 @@ Matrix Matrix::transpose() {
 }
 
 Matrix Matrix::operator/(const double num) const {
-  Matrix result(n);
-  for (std::size_t i = 0; i < n; ++i) {
-    for (std::size_t j = 0; j < n; ++j) {
+  Matrix result{n};
+  for (auto i = 0u; i < n; ++i)
+    for (auto j = 0u; j < n; ++j)
       result(i, j) /= num;
-    }
-  }
+
   return result;
 }
 
@@ -124,26 +122,11 @@ Matrix &Matrix::operator=(const Matrix &other) {
 
 std::ostream &operator<<(std::ostream &os, const Matrix &mat) {
   for (std::size_t i = 0; i < mat.size(); ++i) {
-    for (std::size_t j = 0; j < mat.size(); ++j) {
+    for (std::size_t j = 0; j < mat.size(); ++j)
       os << std::setprecision(4) << std::setw(8) << mat(i, j) << " ";
-    }
     os << '\n';
   }
   return os;
-}
-
-std::vector<double> Matrix::operator*(const std::vector<double> &vec) const {
-  std::vector<double> result;
-
-  double ri = 0;
-  for (std::size_t i = 0; i < n; ++i) {
-    ri = 0;
-    for (std::size_t j = 0; j < n; ++j) {
-      ri += (*this)(i, j) * vec[j];
-    }
-    result.push_back(ri);
-  }
-  return result;
 }
 
 bool Matrix::operator==(const Matrix &other) const {

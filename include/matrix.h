@@ -53,7 +53,6 @@ public: // const operations
   Matrix operator/(double) const;
   bool operator==(const Matrix &) const;
   void eigen_vv(double *, double *) const;
-  std::vector<double> operator*(const std::vector<double> &) const;
 
 public: // static functions:
   static Matrix transposed(const Matrix &);
