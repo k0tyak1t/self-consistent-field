@@ -6,12 +6,17 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include "matrix.h"
 #include "mur_dav_prim_integrals.h"
 #include "standard_matrices.h"
 #include "utils.h"
 #define ANGSTROM_TO_BOHR 1.8897259886
+
+using std::make_pair;
+using std::pair;
+using std::vector;
 
 bool InputAndMDIntegrals::readGeom(char *filename) {
   std::ifstream inp(filename);
@@ -148,7 +153,7 @@ bool InputAndMDIntegrals::calc(StandardMatrices &std_m) {
           for (auto i1 = i->begin(); i1 != i->end(); i1++)
             for (auto j1 = j->begin(); j1 != j->end(); j1++)
               for (auto k1 = k->begin(); k1 != k->end(); k1++)
-                for (auto l1 = (*l).begin(); l1 != (*l).end(); l1++) {
+                for (auto l1 = l->begin(); l1 != l->end(); l1++) {
                   double Vijkl_t = 0;
                   SingleBasisFunction f1 = i1->second;
                   SingleBasisFunction f2 = j1->second;
@@ -215,7 +220,7 @@ void InputAndMDIntegrals::printBasis() {
       std::cout << "  nZ=" << jt->second.nz << '\n';
       for (auto kt = jt->second.ai_ci.begin(); kt != jt->second.ai_ci.end();
            kt++)
-        std::cout << "         " << kt->first << "  " << kt->second << '\n';
+        std::cout << "  " << kt->first << "  " << kt->second << '\n';
     }
   }
 }

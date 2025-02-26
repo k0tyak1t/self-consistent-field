@@ -7,11 +7,6 @@
 #include "single_basis_function.h"
 #include "standard_matrices.h"
 
-using std::make_pair;
-using std::map;
-using std::pair;
-using std::vector;
-
 class InputAndMDIntegrals {
 public:
   bool readGeom(char *filename);
@@ -25,7 +20,9 @@ private:
   double calc_Vnn();
   int get_nuclear_charge(const std::string &) const;
   int get_orbital_momentum(const std::string &) const;
-  vector<Atom> atoms;
-  map<int, vector<pair<int, vector<pair<double, double>>>>> basisLib;
-  vector<vector<pair<int, SingleBasisFunction>>> basisFunctions;
+  std::vector<Atom> atoms;
+  std::map<int,
+           std::vector<std::pair<int, std::vector<std::pair<double, double>>>>>
+      basisLib;
+  std::vector<std::vector<std::pair<int, SingleBasisFunction>>> basisFunctions;
 };

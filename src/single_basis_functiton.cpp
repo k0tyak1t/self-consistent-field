@@ -1,9 +1,9 @@
 #include "single_basis_function.h"
 #include <cmath>
 
-void SingleBasisFunction::setLC(const int &nx_, const int &ny_, const int &nz_,
-                                const double &x_, const double &y_,
-                                const double &z_) {
+void SingleBasisFunction::setLC(const int nx_, const int ny_, const int nz_,
+                                const double x_, const double y_,
+                                const double z_) {
   x = x_;
   y = y_;
   z = z_;
